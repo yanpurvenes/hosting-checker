@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RU :: TCP 16-20 DPI & Hosting Checker</title>
+  <meta name="description" content="Инструмент для проверки доступности хостингов, VPS и CDN с оригинальными тестами TCP 16-20 DPI напрямую из браузера.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* VARIABLES */
+    :root {
+      /* Dark Theme (Default Modern) */
+      --bg-base: #060913;
+      --bg-surface: rgba(15, 22, 42, 0.65);
+      --bg-card: rgba(30, 41, 59, 0.45);
+      --border-glow: rgba(99, 102, 241, 0.15);
+      --border-color: rgba(255, 255, 255, 0.06);
+      
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      
+      --clr-success: #10b981;
+      --clr-danger: #f43f5e;
+      --clr-warning: #f59e0b;
+      --clr-info: #3b82f6;
+      --clr-accent: #8b5cf6;
+      
+      --btn-start-bg: #ff008b;
+      --btn-start-hover: #d40074;
+      --btn-share-bg: #1a1a1a;
+      --btn-share-hover: #333333;
+      
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-base: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Fira Code', 'Courier New', Courier, monospace;
+    }
+
+    /* CLASSIC LIGHT THEME (HYPERION STYLE OVERRIDES) */
+    body.classic-theme {
+      --bg-base: #f5f7fa;
+      --bg-surface: #ffffff;
+      --bg-card: #ffffff;
+      --border-glow: rgba(0, 0, 0, 0.05);
+      --border-color: #e0e0e0;
+      
+      --text-primary: #333333;
+      --text-secondary: #555555;
+      --text-muted: #777777;
+      
+      --clr-success: #28a745;
+      --clr-danger: #dc3545;
+      --clr-warning: #fd7e14;
+      --clr-info: #007bff;
+      --clr-accent: #6f42c1;
+      
+      --radius-lg: 8px;
+      --radius-md: 6px;
+      --radius-sm: 4px;
+      --font-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      --font-mono: 'Courier New', Courier, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-base);
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      padding: 20px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* GRADIENT BG FOR DARK MODE ONLY */
+    body:not(.classic-theme) {
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* PANEL STYLING */
+    .glass-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
+      transition: var(--transition);
+    }
+
+    body:not(.classic-theme) .glass-panel {
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    /* HEADER & BRANDING */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 20px;
+      margin-bottom: 10px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, var(--clr-info), var(--clr-accent));
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 1.2rem;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .brand-titles h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.5px;
+    }
+
+    body.classic-theme .brand-titles h1 {
+      font-family: var(--font-base);
+      color: #1a1a1a;
+    }
+
+    .brand-titles p {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    /* CONTROLS & BUTTONS */
+    .action-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      border: 0;
+      cursor: pointer;
+      color: #ffffff;
+      transition: var(--transition);
+    }
+
+    .btn:disabled {
+      background: #6c757d !important;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    #start-btn {
+      background: var(--btn-start-bg);
+      min-width: 130px;
+    }
+
+    #start-btn:hover:not(:disabled) {
+      background: var(--btn-start-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 0, 139, 0.3);
+    }
+
+    #share-btn {
+      background: var(--btn-share-bg);
+      border: 1px solid var(--border-color);
+    }
+
+    #share-btn:hover:not(:disabled) {
+      background: var(--btn-share-hover);
+      transform: translateY(-2px);
+    }
+
+    .theme-toggle-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .theme-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--clr-info);
+    }
+
+    body.classic-theme .theme-toggle-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    /* RIPE ASN INFO */
+    .asn-banner {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--clr-info);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    body.classic-theme .asn-banner {
+      background: #e9ecef;
+      border-left-color: #007bff;
+      color: #495057;
+    }
+
+    .asn-br::after {
+      content: " • ";
+      opacity: 0.5;
+    }
+
+    /* CONFIGURATION ROW */
+    .config-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    body.classic-theme .config-row {
+      background: #f8f9fa;
+    }
+
+    .config-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .config-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .range-slider {
+      -webkit-appearance: none;
+      width: 100px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    body.classic-theme .range-slider {
+      background: #dee2e6;
+    }
+
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--clr-info);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    /* SEARCH & TABS */
+    .filter-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .search-bar {
+      width: 100%;
+      padding: 10px 16px;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      outline: none;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    body.classic-theme .search-bar {
+      background: #ffffff;
+      border-color: #ced4da;
+    }
+
+    .search-bar:focus {
+      border-color: var(--clr-info);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .category-tabs {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .tab-btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: transparent;
+      border: 0;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+      transition: var(--transition);
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    body.classic-theme .tab-btn:hover {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .tab-btn.active {
+      background: rgba(59, 130, 246, 0.08);
+      color: var(--clr-info);
+    }
+
+    body.classic-theme .tab-btn.active {
+      background: #007bff;
+      color: #ffffff;
+    }
+
+    /* CLASSIC TABLE STYLE */
+    .hosts-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .hosts-table th,
+    .hosts-table td {
+      padding: 10px 15px;
+      text-align: center;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .hosts-table th {
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    body.classic-theme .hosts-table th {
+      background: #007bff;
+      color: #ffffff;
+      border: 1px solid #dee2e6;
+    }
+
+    body.classic-theme .hosts-table td {
+      border: 1px solid #dee2e6;
+      background: #ffffff;
+    }
+
+    .hosts-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    body:not(.classic-theme) .hosts-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* STATUS COLORS */
+    .ok {
+      color: var(--clr-success) !important;
+      font-weight: 600;
+    }
+
+    .bad {
+      color: var(--clr-danger) !important;
+      font-weight: 600;
+    }
+
+    .skip {
+      color: var(--text-muted) !important;
+      font-weight: 500;
+    }
+
+    .checking-text {
+      color: var(--clr-info);
+      font-weight: 500;
+    }
+
+    /* MONOSPACE CONSOLE LOG */
+    .log-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .log-header-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    #log {
+      background: #090d16;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      max-height: 250px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    body.classic-theme #log {
+      background: #1a1a1a;
+      color: #d4d4d4;
+      border: 0;
+    }
+
+    /* FOOTER */
+    .app-footer {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 1rem;
+      line-height: 1.5;
+    }
+
+    .app-footer a {
+      color: var(--clr-info);
+      text-decoration: none;
+    }
+
+    .app-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* RESPONSIVE DESIGN */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .action-bar {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .hosts-table th, 
+      .hosts-table td {
+        padding: 6px 8px;
+        font-size: 0.78rem;
+      }
+      .config-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- MAIN scanning PANEL -->
+  <main class="glass-panel">
+    
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="brand-group">
+        <div class="logo-badge">⚡</div>
+        <div class="brand-titles">
+          <h1 id="app-title">RU :: TCP 16-20 & Hosting Checker</h1>
+          <p id="app-subtitle">Проверка доступности VPS-хостингов и CDN-сетей методом TCP 16-20</p>
+        </div>
+      </div>
+      
+      <div class="action-bar">
+        <button id="start-btn" class="btn" disabled>🔍 Start</button>
+        <button id="share-btn" class="btn" disabled>🔗 Share</button>
+        <button id="theme-toggle" class="theme-toggle-btn" title="Переключить тему оформления">
+          <!-- Theme Switcher SVG Icon -->
+          <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24">
+            <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- CLIENT RIPE ASN INFO -->
+    <div class="asn-banner" id="asn-banner">
+      <span id="asn">Определение сетевого провайдера...</span>
+      <span id="shareTs"></span>
+    </div>
+
+    <!-- CONFIGURATION AND CONTROLS -->
+    <section class="config-row">
+      <div class="config-group">
+        <div class="config-item">
+          <span>Таймаут:</span>
+          <input type="range" id="timeout-slider" class="range-slider" min="1" max="15" value="10">
+          <span id="timeout-val" style="font-weight:600; color: var(--clr-info);">10s</span>
+        </div>
+        <div class="config-item">
+          <span>Потоки:</span>
+          <input type="range" id="concurrency-slider" class="range-slider" min="1" max="12" value="6">
+          <span id="concurrency-val" style="font-weight:600; color: var(--clr-accent);">6</span>
+        </div>
+      </div>
+      <div style="font-size:0.8rem; color: var(--text-muted);">
+        Status: <span id="status" class="status-ready ok">Ready ⚡</span>
+      </div>
+    </section>
+
+    <!-- SEARCH & FILTER TABS -->
+    <section class="filter-wrapper">
+      <input type="text" id="search-input" class="search-bar" placeholder="Быстрый поиск по названию провайдера или домену...">
+      
+      <div class="category-tabs" id="category-tabs">
+        <button class="tab-btn active" data-category="all">Все ресурсы (0)</button>
+        <button class="tab-btn" data-category="foreign-vps">Зарубежные VPS (0)</button>
+        <button class="tab-btn" data-category="rf-roots">С РФ корнями (0)</button>
+        <button class="tab-btn" data-category="infomaniak">Infomaniak (0)</button>
+        <button class="tab-btn" data-category="foreign-cdn">Зарубежные CDN (0)</button>
+        <button class="tab-btn" data-category="rf-cdn">Российские CDN (0)</button>
+      </div>
+    </section>
+
+    <!-- RESULTS TABLE -->
+    <div style="overflow-x: auto; margin-top: 10px;">
+      <table class="hosts-table" id="results">
+        <thead>
+          <tr>
+            <th style="width: 12%;">#</th>
+            <th style="text-align: left; width: 48%;">Провайдер / Хост</th>
+            <th style="width: 20%;">Доступен (Alive)</th>
+            <th style="width: 20%;">DPI TCP 16-20</th>
+          </tr>
+        </thead>
+        <tbody id="results-tbody">
+          <!-- Dynamically populated rows -->
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <!-- LOG PANEL -->
+  <section class="log-panel">
+    <div class="log-header-title">Диагностический журнал логов</div>
+    <pre id="log"></pre>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <p>❗️ В браузерной песочнице TCP-соединения не могут быть принудительно сброшены — повторные тесты могут кэшировать сокеты.</p>
+    <p>Рекомендуется использовать режим инкогнито или сбрасывать сокеты в Chrome по ссылке <a href="chrome://net-internals/#sockets" target="_blank">chrome://net-internals/#sockets</a> для каждого нового теста.</p>
+    <p>Создано на базе исследований <a href="https://github.com/hyperion-cs/dpi-checkers" target="_blank">hyperion-cs/dpi-checkers</a></p>
+  </footer>
+
+</div>
+
+<script>
+  // DATABASE OF TARGETS
+  const TEST_SUITE = [
+    // --- SUITE V2 ORIGINAL TARGETS ---
+    { id: "US.GH-HPRN", provider: "Self check", country: "🧠", host: "hyperion-cs.github.io", category: "foreign-cdn" },
+    { id: "PL.AKM-01", provider: "Akamai", country: "🇵🇱", host: "www.mobil.com.se", category: "foreign-cdn" },
+    { id: "SE.AKM-01", provider: "Akamai", country: "🇸🇪", host: "cdn.apple-mapkit.com", category: "foreign-cdn" },
+    { id: "DE.AWS-01", provider: "AWS", country: "🇩🇪", host: "amplifon.com", category: "foreign-vps" },
+    { id: "US.AWS-01", provider: "AWS", country: "🇺🇸", host: "marsh.com", category: "foreign-vps" },
+    { id: "US.CDN77-01", provider: "CDN77", country: "🇺🇸", host: "cdn.eso.org", category: "foreign-cdn" },
+    { id: "CA.CF-01", provider: "Cloudflare", country: "🇨🇦", host: "go.coveo.com", category: "foreign-cdn" },
+    { id: "CA.CF-02", provider: "Cloudflare", country: "🇨🇦", host: "justice.gov", category: "foreign-cdn" },
+    { id: "US.CF-01", provider: "Cloudflare", country: "🇺🇸", host: "img.wzstats.gg", category: "foreign-cdn" },
+    { id: "US.CF-02", provider: "Cloudflare", country: "🇺🇸", host: "esm.sh", category: "foreign-cdn" },
+    { id: "FR.CNTB-01", provider: "Contabo", country: "🇫🇷", host: "antoniotartaglia.it", category: "foreign-vps" },
+    { id: "FR.CNTB-02", provider: "Contabo", country: "🇫🇷", host: "status.moow.info", category: "foreign-vps" },
+    { id: "DE.DO-01", provider: "DigitalOcean", country: "🇩🇪", host: "ui-arts.com", category: "foreign-vps" },
+    { id: "UK.DO-01", provider: "DigitalOcean", country: "🇬🇧", host: "kingswoodssweets.co.uk", category: "foreign-vps" },
+    { id: "UK.DO-02", provider: "DigitalOcean", country: "🇬🇧", host: "admin.survey54.com", category: "foreign-vps" },
+    { id: "CA.FST-01", provider: "Fastly", country: "🇨🇦", host: "ssl.p.jwpcdn.com", category: "foreign-cdn" },
+    { id: "US.FST-01", provider: "Fastly", country: "🇺🇸", host: "www.jetblue.com", category: "foreign-cdn" },
+    { id: "US.FTBVM-01", provider: "FT/BuyVM", country: "🇺🇸", host: "buyvm.net", category: "foreign-vps" },
+    { id: "US.FTBVM-02", provider: "FT/BuyVM", country: "🇺🇸", host: "dmvideo.download", category: "foreign-vps" },
+    { id: "LU.GCORE-01", provider: "Gcore", country: "🇱🇺", host: "gcore.com", category: "foreign-cdn" },
+    { id: "US.GC-01", provider: "Google Cloud", country: "🇺🇸", host: "api.usercentrics.eu", category: "foreign-vps" },
+    { id: "US.GC-02", provider: "Google Cloud", country: "🇺🇸", host: "widgets.reputation.com", category: "foreign-vps" },
+    { id: "DE.HE-01", provider: "Hetzner", country: "🇩🇪", host: "king.hr", category: "foreign-vps" },
+    { id: "DE.HE-02", provider: "Hetzner", country: "🇩🇪", host: "mail.server.apaone.com", category: "foreign-vps" },
+    { id: "FI.HE-01", provider: "Hetzner", country: "🇫🇮", host: "nioges.com", category: "foreign-vps" },
+    { id: "FI.HE-02", provider: "Hetzner", country: "🇫🇮", host: "5fd8bdae.nip.io", category: "foreign-vps" },
+    { id: "FI.HE-03", provider: "Hetzner", country: "🇫🇮", host: "5fd8bca5.nip.io", category: "foreign-vps" },
+    { id: "US.MBCOM-01", provider: "Melbicom", country: "🇺🇸", host: "elecane.com", category: "foreign-vps" },
+    { id: "NL.MS-01", provider: "Microsoft/Azure", country: "🇳🇱", host: "store.takeda.com", category: "foreign-vps" },
+    { id: "ES.OR-01", provider: "Oracle", country: "🇪🇸", host: "sh00065.hostgator.com", category: "foreign-vps" },
+    { id: "SG.OR-01", provider: "Oracle", country: "🇸🇬", host: "ged.com.sg", category: "foreign-vps" },
+    { id: "FR.OVH-01", provider: "OVH", country: "🇫🇷", host: "www.adwin.fr", category: "foreign-vps" },
+    { id: "FR.OVH-02", provider: "OVH", country: "🇫🇷", host: "www.emca.be", category: "foreign-vps" },
+    { id: "NL.SW-01", provider: "Scaleway", country: "🇳🇱", host: "www.velivole.fr", category: "foreign-vps" },
+    { id: "DE.VLTR-01", provider: "Vultr", country: "🇩🇪", host: "askit-app.de", category: "foreign-vps" },
+    { id: "US.VLTR-01", provider: "Vultr", country: "🇺🇸", host: "us.rudder.qntmnet.com", category: "foreign-vps" },
+
+    // --- NETCUP ---
+    { id: "DE.NCP-01", provider: "Netcup", country: "🇩🇪", host: "www.netcup.de", category: "foreign-vps" },
+    { id: "DE.NCP-02", provider: "Netcup", country: "🇩🇪", host: "www.netcup.eu", category: "foreign-vps" },
+
+    // --- INFOMANIAK ---
+    { id: "CH.INF-01", provider: "Infomaniak", country: "🇨🇭", host: "www.infomaniak.com", category: "infomaniak" },
+
+    // --- UPCLOUD ---
+    { id: "FI.UPC-01", provider: "UpCloud", country: "🇫🇮", host: "upcloud.com", category: "foreign-vps" },
+
+    // --- RUSSIAN ROOT HOSTINGS (20 PROVIDERS) ---
+    { id: "RU.SEL-01", provider: "Selectel", country: "🇷🇺", host: "selectel.ru", category: "rf-roots" },
+    { id: "RU.RVD-01", provider: "RuVDS", country: "🇷🇺", host: "ruvds.com", category: "rf-roots" },
+    { id: "RU.FVD-01", provider: "FirstVDS", country: "🇷🇺", host: "firstvds.ru", category: "rf-roots" },
+    { id: "RU.AEZ-01", provider: "Aeza", country: "🇷🇺", host: "aeza.net", category: "rf-roots" },
+    { id: "RU.PQH-01", provider: "PQ Hosting", country: "🇷🇺", host: "pq.hosting", category: "rf-roots" },
+    { id: "RU.TMW-01", provider: "Timeweb", country: "🇷🇺", host: "timeweb.com", category: "rf-roots" },
+    { id: "RU.BGT-01", provider: "Beget", country: "🇷🇺", host: "beget.com", category: "rf-roots" },
+    { id: "RU.REG-01", provider: "Reg.ru", country: "🇷🇺", host: "www.reg.ru", category: "rf-roots" },
+    { id: "RU.HKY-01", provider: "Hostkey RU", country: "🇷🇺", host: "hostkey.ru", category: "rf-roots" },
+    { id: "RU.SPW-01", provider: "SpaceWeb", country: "🇷🇺", host: "sweb.ru", category: "rf-roots" },
+    { id: "RU.SPH-01", provider: "Sprinthost", country: "🇷🇺", host: "sprinthost.ru", category: "rf-roots" },
+    { id: "RU.WNM-01", provider: "Webnames", country: "🇷🇺", host: "www.webnames.ru", category: "rf-roots" },
+    { id: "RU.AVP-01", provider: "AdminVPS", country: "🇷🇺", host: "adminvps.ru", category: "rf-roots" },
+    { id: "RU.FNX-01", provider: "Fornex", country: "🇷🇺", host: "fornex.com", category: "rf-roots" },
+    { id: "RU.RNT-01", provider: "Renter", country: "🇷🇺", host: "renter.ru", category: "rf-roots" },
+    { id: "RU.VDS-01", provider: "VDSina", country: "🇷🇺", host: "vdsina.ru", category: "rf-roots" },
+    { id: "RU.IPS-01", provider: "IPServer", country: "🇷🇺", host: "ipserver.su", category: "rf-roots" },
+    { id: "RU.UVD-01", provider: "UltraVDS", country: "🇷🇺", host: "ultravds.com", category: "rf-roots" },
+    { id: "RU.MCH-01", provider: "Макхост", country: "🇷🇺", host: "mchost.ru", category: "rf-roots" },
+    { id: "RU.EBT-01", provider: "Евробайт", country: "🇷🇺", host: "eurobyte.ru", category: "rf-roots" },
+
+    // --- OTHER TOP VPS PROVIDERS (TO FILL OUT TOP 30 IMPO) ---
+    { id: "LT.HST-01", provider: "Hostinger", country: "🇱🇹", host: "www.hostinger.com", category: "foreign-vps" },
+    { id: "US.NMC-01", provider: "Namecheap", country: "🇺🇸", host: "www.namecheap.com", category: "foreign-vps" },
+    { id: "US.GDD-01", provider: "GoDaddy", country: "🇺🇸", host: "www.godaddy.com", category: "foreign-vps" },
+    { id: "US.A2H-01", provider: "A2 Hosting", country: "🇺🇸", host: "www.a2hosting.com", category: "foreign-vps" },
+    { id: "BG.STG-01", provider: "SiteGround", country: "🇧🇬", host: "www.siteground.com", category: "foreign-vps" },
+    { id: "US.BLH-01", provider: "Bluehost", country: "🇺🇸", host: "www.bluehost.com", category: "foreign-vps" },
+    { id: "US.DMH-01", provider: "DreamHost", country: "🇺🇸", host: "www.dreamhost.com", category: "foreign-vps" },
+    { id: "US.FCM-01", provider: "FastComet", country: "🇺🇸", host: "www.fastcomet.com", category: "foreign-vps" },
+    { id: "DE.ION-01", provider: "IONOS", country: "🇩🇪", host: "www.ionos.com", category: "foreign-vps" },
+    { id: "US.KMT-01", provider: "Kamatera", country: "🇺🇸", host: "www.kamatera.com", category: "foreign-vps" },
+    { id: "US.RMN-01", provider: "RamNode", country: "🇺🇸", host: "www.ramnode.com", category: "foreign-vps" },
+    { id: "US.HWD-01", provider: "Hostwinds", country: "🇺🇸", host: "www.hostwinds.com", category: "foreign-vps" },
+    { id: "US.ITS-01", provider: "InterServer", country: "🇺🇸", host: "www.interserver.net", category: "foreign-vps" },
+    { id: "US.LQW-01", provider: "Liquid Web", country: "🇺🇸", host: "www.liquidweb.com", category: "foreign-vps" },
+    { id: "NL.HKG-01", provider: "HostKey Global", country: "🇳🇱", host: "hostkey.com", category: "foreign-vps" },
+    { id: "US.IMH-01", provider: "InMotion Hosting", country: "🇺🇸", host: "www.inmotionhosting.com", category: "foreign-vps" },
+    { id: "LT.HTS-01", provider: "Hostens", country: "🇱🇹", host: "www.hostens.com", category: "foreign-vps" },
+    { id: "US.GGK-01", provider: "GreenGeeks", country: "🇺🇸", host: "www.greengeeks.com", category: "foreign-vps" },
+
+    // --- RF CDN ---
+    { id: "RU.YND-01", provider: "Yandex CDN", country: "🇷🇺", host: "yastatic.net", category: "rf-cdn" },
+    { id: "RU.VK-01", provider: "VK CDN", country: "🇷🇺", host: "sun9-1.userapi.com", category: "rf-cdn" },
+    { id: "RU.NGX-01", provider: "Ngenix", country: "🇷🇺", host: "www.ngenix.net", category: "rf-cdn" },
+    { id: "RU.EDG-01", provider: "EdgeCenter CDN", country: "🇷🇺", host: "edgecenter.ru", category: "rf-cdn" },
+    { id: "RU.CDV-01", provider: "CDNvideo", country: "🇷🇺", host: "www.cdnvideo.ru", category: "rf-cdn" },
+    { id: "RU.MTS-01", provider: "MTS CDN", country: "🇷🇺", host: "mts.ru", category: "rf-cdn" },
+    { id: "RU.MGF-01", provider: "MegaFon CDN", country: "🇷🇺", host: "megafon.ru", category: "rf-cdn" }
+  ];
+
+  // CONSTANTS FOR SCANNING
+  const DPI_THR_BYTES = 64 * 1024;
+  const MAX_URI_X_SIZE = 7 * 1024;
+  const RIPE_API_URL = "https://stat.ripe.net/data/";
+
+  const ALIVE_NO = 0;
+  const ALIVE_YES = 1;
+  const ALIVE_UNKNOWN = 2;
+
+  const DPI_METHOD_NOT_DETECTED = 0;
+  const DPI_METHOD_DETECTED = 1;
+  const DPI_METHOD_PROBABLY = 2;
+  const DPI_METHOD_POSSIBLE = 3;
+  const DPI_METHOD_UNLIKELY = 4;
+
+  // APP STATE
+  let state = {
+    results: {}, // id -> { alive, dpi, latency, timestamp }
+    isRunning: false,
+    timeout: 10,
+    concurrency: 6,
+    currentCategory: "all",
+    searchQuery: "",
+    clientAsn: 0,
+    queue: [],
+    activeWorkers: 0
+  };
+
+  // DOM ELEMENTS
+  const btnStart = document.getElementById("start-btn");
+  const btnShare = document.getElementById("share-btn");
+  const btnThemeToggle = document.getElementById("theme-toggle");
+  const searchInput = document.getElementById("search-input");
+  const timeoutSlider = document.getElementById("timeout-slider");
+  const timeoutVal = document.getElementById("timeout-val");
+  const concurrencySlider = document.getElementById("concurrency-slider");
+  const concurrencyVal = document.getElementById("concurrency-val");
+  const categoryTabs = document.getElementById("category-tabs");
+  const resultsTbody = document.getElementById("results-tbody");
+  const logEl = document.getElementById("log");
+  const asnEl = document.getElementById("asn");
+  const shareTsEl = document.getElementById("shareTs");
+  const statusEl = document.getElementById("status");
+
+  // CONSOLE LOGGER
+  function logPush(level, prefix, msg) {
+    const now = new Date();
+    const ts = now.toLocaleTimeString([], { hour12: false }) + "." + now.getMilliseconds().toString().padStart(3, "0");
+    logEl.textContent += `[${ts}] ${prefix ? prefix + "/" : ""}${level}: ${msg}\n`;
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  // GET HELPER DATA FUNCTIONS
+  const getUniqueUrl = url => url.includes('?') ? `${url}&t=${Math.random()}` : `${url}?t=${Math.random()}`;
+
+  const getRandomData = size => {
+    const data = new Uint8Array(size);
+    const grvMax = 64 * 1024;
+    for (let offset = 0; offset < size; offset += grvMax) {
+      crypto.getRandomValues(data.subarray(offset, offset + grvMax));
+    }
+    return data;
+  };
+
+  const getRandomSafeData = (n) => {
+    const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    return Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  };
+
+  const getDefaultFetchOpt = (ctrl, method = "GET") => ({
+    method,
+    mode: "no-cors",
+    referrer: "",
+    credentials: "omit",
+    cache: "no-store",
+    signal: ctrl.signal,
+    redirect: "follow",
+    keepalive: false
+  });
+
+  // FILTER LOGIC
+  function getFilteredSuite() {
+    return TEST_SUITE.filter(p => {
+      const matchesCategory = state.currentCategory === "all" || p.category === state.currentCategory;
+      const matchesSearch = p.provider.toLowerCase().includes(state.searchQuery.toLowerCase()) || 
+                           p.host.toLowerCase().includes(state.searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }
+
+  // UPDATE TAB COUNTS
+  function updateCategoryTabCounts() {
+    const tabs = categoryTabs.querySelectorAll(".tab-btn");
+    tabs.forEach(tab => {
+      const cat = tab.getAttribute("data-category");
+      let count = 0;
+      if (cat === "all") {
+        count = TEST_SUITE.length;
+      } else {
+        count = TEST_SUITE.filter(p => p.category === cat).length;
+      }
+      
+      let name = "";
+      switch(cat) {
+        case "all": name = "Все ресурсы"; break;
+        case "foreign-vps": name = "Зарубежные VPS"; break;
+        case "rf-roots": name = "С РФ корнями"; break;
+        case "infomaniak": name = "Infomaniak"; break;
+        case "foreign-cdn": name = "Зарубежные CDN"; break;
+        case "rf-cdn": name = "Российские CDN"; break;
+      }
+      tab.textContent = `${name} (${count})`;
+    });
+  }
+
+  // RENDER TABLE ROWS
+  function renderTable() {
+    const filtered = getFilteredSuite();
+    resultsTbody.innerHTML = "";
+
+    if (filtered.length === 0) {
+      resultsTbody.innerHTML = `<tr><td colspan="4" style="color: var(--text-muted); padding: 2rem;">Ресурсы не найдены</td></tr>`;
+      return;
+    }
+
+    filtered.forEach(p => {
+      const row = document.createElement("tr");
+      row.id = `row-${p.id}`;
+
+      const res = state.results[p.id];
+      
+      let idCell = `<td>${p.id}</td>`;
+      let providerCell = `<td style="text-align: left;">${p.country} ${p.provider} <span style="font-size:0.75rem; color:var(--text-muted);">(${p.host})</span></td>`;
+      
+      let aliveCell = `<td class="skip">Ожидание</td>`;
+      let dpiCell = `<td class="skip">Ожидание</td>`;
+
+      if (res) {
+        // Render Alive State
+        if (res.alive === "checking") {
+          aliveCell = `<td class="checking-text">Тест... ⏰</td>`;
+        } else if (res.alive === ALIVE_YES) {
+          aliveCell = `<td class="ok">Yes 🟢 <span style="font-size:0.75rem; font-family:var(--font-mono); font-weight:normal;">(${Math.round(res.latency)}ms)</span></td>`;
+        } else if (res.alive === ALIVE_NO) {
+          aliveCell = `<td class="bad">No 🔴</td>`;
+        } else {
+          aliveCell = `<td class="skip">Unknown ⚠️</td>`;
+        }
+
+        // Render DPI State
+        if (res.dpi === "waiting") {
+          dpiCell = `<td class="skip">Ожидание</td>`;
+        } else if (res.dpi === "checking") {
+          dpiCell = `<td class="checking-text">Тест... ⏰</td>`;
+        } else if (res.dpi === DPI_METHOD_NOT_DETECTED) {
+          dpiCell = `<td class="ok">No ✅</td>`;
+        } else if (res.dpi === DPI_METHOD_DETECTED) {
+          dpiCell = `<td class="bad">Detected❗️</td>`;
+        } else if (res.dpi === DPI_METHOD_PROBABLY) {
+          dpiCell = `<td class="bad" style="opacity: 0.85;">Probably❗️</td>`;
+        } else if (res.dpi === DPI_METHOD_POSSIBLE) {
+          dpiCell = `<td class="skip" style="color: var(--clr-warning) !important;">Possible ⚠️</td>`;
+        } else if (res.dpi === DPI_METHOD_UNLIKELY) {
+          dpiCell = `<td class="skip">Unlikely ⚠️</td>`;
+        } else if (res.dpi === "skip") {
+          dpiCell = `<td class="skip">Skip ⚠️</td>`;
+        }
+      }
+
+      row.innerHTML = idCell + providerCell + aliveCell + dpiCell;
+      resultsTbody.appendChild(row);
+    });
+  }
+
+  // --- CORE TCP 16-20 DIAGNOSTICS ENGINE ---
+
+  const handleDpiMethodErr = (alive, e) => {
+    if (e.name === "AbortError") {
+      if (alive) return DPI_METHOD_DETECTED; // alive passed, large body post timed out -> DPI detected!
+      return DPI_METHOD_PROBABLY; // alive failed instantly, but post timed out
+    }
+    if (alive) return DPI_METHOD_POSSIBLE; // alive passed, large post threw error instantly
+    return DPI_METHOD_UNLIKELY; // everything failed instantly
+  };
+
+  const dpiHugeBodyPostMethod = async (alive, host) => {
+    try {
+      const dpiCtrl = new AbortController();
+      const dpiTimeoutId = setTimeout(() => dpiCtrl.abort(), state.timeout * 1000);
+      const opt = getDefaultFetchOpt(dpiCtrl, "POST");
+      opt.body = getRandomData(DPI_THR_BYTES); // Send 64KB random data
+      const url = `https://${host}/`;
+      await fetch(getUniqueUrl(url), opt);
+      clearTimeout(dpiTimeoutId);
+    } catch (e) {
+      return handleDpiMethodErr(alive, e);
+    }
+    return DPI_METHOD_NOT_DETECTED;
+  };
+
+  const dpiHugeReqlineHeadMethod = async (alive, host) => {
+    try {
+      const times = DPI_THR_BYTES / MAX_URI_X_SIZE; // Send multiple small packets to sum 64KB over keepalive
+      const dpiCtrl = new AbortController();
+      const dpiTimeoutId = setTimeout(() => dpiCtrl.abort(), state.timeout * 1000);
+      for (let i = 0; i < times; i++) {
+        const opt = getDefaultFetchOpt(dpiCtrl, "HEAD");
+        const url = `https://${host}/?x=${getRandomSafeData(MAX_URI_X_SIZE)}`;
+        await fetch(getUniqueUrl(url), opt);
+      }
+      clearTimeout(dpiTimeoutId);
+    } catch (e) {
+      return handleDpiMethodErr(alive, e);
+    }
+    return DPI_METHOD_NOT_DETECTED;
+  };
+
+  // JOB SCANNER WORKER
+  async function scanTarget(p) {
+    const prefix = `DPI checking(#${p.id})`;
+    let t0 = performance.now();
+
+    // Mark as checking alive
+    state.results[p.id] = { alive: "checking", dpi: "waiting", latency: 0, timestamp: "" };
+    renderTable();
+
+    let alive = false;
+    let possibleAlive = false;
+    let rtt = 0;
+
+    try {
+      // 1. Perform Alive Check using simple HEAD
+      const aliveCtrl = new AbortController();
+      const aliveTimeoutId = setTimeout(() => aliveCtrl.abort(), state.timeout * 1000);
+      const url = `https://${p.host}/`;
+      await fetch(getUniqueUrl(url), getDefaultFetchOpt(aliveCtrl, "HEAD"));
+      clearTimeout(aliveTimeoutId);
+      
+      rtt = performance.now() - t0;
+      logPush("INFO", prefix, `alived: yes 🟢, reqtime: ${rtt.toFixed(1)} ms`);
+      state.results[p.id].alive = ALIVE_YES;
+      state.results[p.id].latency = rtt;
+      alive = true;
+      possibleAlive = true;
+    } catch (e) {
+      rtt = performance.now() - t0;
+      if (e.name === "AbortError") {
+        logPush("INFO", prefix, `alived: no 🔴 (Timeout), reqtime: ${rtt.toFixed(1)} ms`);
+        state.results[p.id].alive = ALIVE_NO;
+      } else {
+        logPush("INFO", prefix, `alived: unknown ⚠️, reqtime: ${rtt.toFixed(1)} ms`);
+        state.results[p.id].alive = ALIVE_UNKNOWN;
+        possibleAlive = true;
+      }
+    }
+
+    renderTable();
+
+    if (!alive && !possibleAlive) {
+      state.results[p.id].dpi = "skip";
+      renderTable();
+      return;
+    }
+
+    // 2. Perform TCP 16-20 DPI check
+    state.results[p.id].dpi = "checking";
+    renderTable();
+
+    // Run Method 1 (Huge Body POST)
+    const m1 = await dpiHugeBodyPostMethod(alive, p.host);
+    if (m1 === DPI_METHOD_DETECTED) {
+      logPush("INFO", prefix, `tcp 16-20: detected❗️, method: 1 (Huge POST body)`);
+      state.results[p.id].dpi = DPI_METHOD_DETECTED;
+      renderTable();
+      return;
+    }
+
+    // Run Method 2 (Multiple large HEAD URIs)
+    t0 = performance.now();
+    const m2 = await dpiHugeReqlineHeadMethod(alive, p.host);
+    state.results[p.id].dpi = m2;
+
+    const logDpiMap = {
+      [DPI_METHOD_DETECTED]: `tcp 16-20: detected❗️, method: 2 (Huge URI reqline)`,
+      [DPI_METHOD_PROBABLY]: `tcp 16-20: probably detected ⚠️, reqtime: ${(performance.now() - t0).toFixed(1)} ms`,
+      [DPI_METHOD_POSSIBLE]: `tcp 16-20: possible detected ⚠️, reqtime: ${(performance.now() - t0).toFixed(1)} ms`,
+      [DPI_METHOD_UNLIKELY]: `tcp 16-20: unlikely ⚠️, reqtime: ${(performance.now() - t0).toFixed(1)} ms`,
+      [DPI_METHOD_NOT_DETECTED]: `tcp 16-20: not detected ✅, reqtime: ${(performance.now() - t0).toFixed(1)} ms`,
+    };
+
+    logPush("INFO", prefix, logDpiMap[m2]);
+    renderTable();
+  }
+
+  // QUEUE PROCESSING PIPELINE
+  async function runWorker() {
+    while (state.queue.length > 0) {
+      const p = state.queue.shift();
+      if (!p) break;
+      state.activeWorkers++;
+      await scanTarget(p);
+      state.activeWorkers--;
+    }
+  }
+
+  async function startScanner() {
+    if (state.isRunning) return;
+    state.isRunning = true;
+    
+    btnStart.disabled = true;
+    btnStart.textContent = "🔍 ...";
+    statusEl.className = "checking-text";
+    statusEl.textContent = "Checking ⏰";
+
+    logEl.textContent = "";
+    logPush("INFO", null, "Запуск многопоточного теста доступности ресурсов...");
+
+    const targets = getFilteredSuite();
+    
+    // Clear previous results
+    state.results = {};
+    targets.forEach(t => {
+      state.results[t.id] = { alive: "checking", dpi: "waiting", latency: 0, timestamp: "" };
+    });
+    renderTable();
+
+    // Populate queue and start concurrency workers
+    state.queue = [...targets];
+    const workersCount = parseInt(state.concurrency);
+    const workers = [];
+
+    for (let i = 0; i < workersCount; i++) {
+      workers.push(runWorker());
+    }
+
+    await Promise.all(workers);
+
+    state.isRunning = false;
+    btnStart.disabled = false;
+    btnStart.textContent = "🔍 Start";
+    btnShare.disabled = false;
+    
+    statusEl.className = "ok";
+    statusEl.textContent = "Ready ⚡";
+    logPush("INFO", null, "Проверка полностью завершена.");
+  }
+
+  // ASN IP DETERMINATION VIA RIPE NCC API
+  const fetchAsn = async () => {
+    try {
+      const ipRes = await fetch(RIPE_API_URL + "whats-my-ip/data.json");
+      const ip = (await ipRes.json()).data.ip;
+      
+      const asnRes = await fetch(RIPE_API_URL + "prefix-overview/data.json?resource=" + ip);
+      const asnData = (await asnRes.json()).data.asns[0];
+      state.clientAsn = Number(asnData.asn);
+      
+      const geoRes = await fetch(RIPE_API_URL + "maxmind-geo-lite/data.json?resource=" + ip);
+      const geoData = (await geoRes.json()).data.located_resources[0].locations[0];
+      
+      asnEl.innerHTML = `ASN: <a href="https://bgp.he.net/AS${asnData.asn}" target="_blank">AS${asnData.asn}</a> (<i>${asnData.holder}</i>)<span class="asn-br"></span>${geoData.country}, ${geoData.city || "—"}`;
+    } catch (err) {
+      console.error("Fetch ASN err:", err);
+      asnEl.innerHTML = "Не удалось автоматически определить ASN провайдера через API RIPE.";
+    }
+  };
+
+  // ENCODE SHARE RESULTS TO BASE64 FOR URL SHARING
+  async function encodeShare() {
+    const prevText = btnShare.textContent;
+    btnShare.textContent = "🔗 ...";
+    btnShare.disabled = true;
+
+    try {
+      const shareObj = {
+        ts: new Date().toISOString(),
+        asn: state.clientAsn,
+        items: Object.keys(state.results).map(id => {
+          const res = state.results[id];
+          const target = TEST_SUITE.find(x => x.id === id);
+          return {
+            id: id,
+            provider: target.provider,
+            country: target.country,
+            alive: res.alive,
+            dpi: res.dpi,
+            latency: res.latency
+          };
+        })
+      };
+
+      // Compact JSON representation encoded using standard base64 url-safe
+      const jsonStr = JSON.stringify(shareObj);
+      const utf8Bytes = new TextEncoder().encode(jsonStr);
+      let binaryStr = "";
+      for (let i = 0; i < utf8Bytes.length; i++) {
+        binaryStr += String.fromCharCode(utf8Bytes[i]);
+      }
+      const b64 = btoa(binaryStr)
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+
+      const url = `${window.location.origin + window.location.pathname}?share=${b64}`;
+      await navigator.clipboard.writeText(url);
+      alert("Ссылка на ваши результаты скопирована в буфер обмена!");
+    } catch (e) {
+      console.error(e);
+      alert("Не удалось сгенерировать ссылку для шеринга результатов.");
+    } finally {
+      btnShare.textContent = prevText;
+      btnShare.disabled = false;
+    }
+  }
+
+  // HANDLE SHARING READING AT LOADING
+  function tryHandleShare() {
+    const params = new URLSearchParams(window.location.search);
+    const shareParam = params.get("share");
+    if (!shareParam) return false;
+
+    try {
+      // Decode URL safe Base64
+      let b64 = shareParam.replace(/-/g, "+").replace(/_/g, "/");
+      while (b64.length % 4) b64 += "=";
+      
+      const binaryStr = atob(b64);
+      const bytes = new Uint8Array(binaryStr.length);
+      for (let i = 0; i < binaryStr.length; i++) {
+        bytes[i] = binaryStr.charCodeAt(i);
+      }
+      
+      const jsonStr = new TextDecoder().decode(bytes);
+      const decoded = JSON.parse(jsonStr);
+
+      // Lock dashboard, show static shared results
+      document.getElementById("app-subtitle").textContent = "Сохраненный отчет проверки доступности";
+      btnStart.style.display = "none";
+      btnShare.style.display = "none";
+      document.querySelector(".config-row").style.display = "none";
+      document.querySelector(".filter-wrapper").style.display = "none";
+
+      asnEl.innerHTML = decoded.asn ? `ASN: <a href="https://bgp.he.net/AS${decoded.asn}" target="_blank">AS${decoded.asn}</a> (Архивные результаты)` : "Архивные результаты";
+      shareTsEl.textContent = `Дата теста: ${new Date(decoded.ts).toLocaleString()}`;
+
+      // Populate results in table
+      resultsTbody.innerHTML = "";
+      decoded.items.forEach(v => {
+        const row = document.createElement("tr");
+        let aliveHTML = `<td class="skip">Unknown ⚠️</td>`;
+        if (v.alive === ALIVE_YES) {
+          aliveHTML = `<td class="ok">Yes 🟢 <span style="font-size:0.75rem; font-family:var(--font-mono);">(${Math.round(v.latency)}ms)</span></td>`;
+        } else if (v.alive === ALIVE_NO) {
+          aliveHTML = `<td class="bad">No 🔴</td>`;
+        }
+
+        let dpiHTML = `<td class="skip">Skip ⚠️</td>`;
+        if (v.dpi === DPI_METHOD_NOT_DETECTED) {
+          dpiHTML = `<td class="ok">No ✅</td>`;
+        } else if (v.dpi === DPI_METHOD_DETECTED) {
+          dpiHTML = `<td class="bad">Detected❗️</td>`;
+        } else if (v.dpi === DPI_METHOD_PROBABLY) {
+          dpiHTML = `<td class="bad" style="opacity: 0.85;">Probably❗️</td>`;
+        } else if (v.dpi === DPI_METHOD_POSSIBLE) {
+          dpiHTML = `<td class="skip" style="color: var(--clr-warning) !important;">Possible ⚠️</td>`;
+        } else if (v.dpi === DPI_METHOD_UNLIKELY) {
+          dpiHTML = `<td class="skip">Unlikely ⚠️</td>`;
+        }
+
+        row.innerHTML = `<td>${v.id}</td><td style="text-align: left;">${v.country} ${v.provider}</td>${aliveHTML}${dpiHTML}`;
+        resultsTbody.appendChild(row);
+      });
+
+      logEl.textContent = `--- Загружен архивный отчет от ${new Date(decoded.ts).toLocaleString()} ---\nВсего проверено хостов: ${decoded.items.length}`;
+      return true;
+    } catch (e) {
+      console.error(e);
+      alert("Ссылка на отчет повреждена или устарела.");
+      return false;
+    }
+  }
+
+  // THEME SWITCHER
+  function toggleTheme() {
+    document.body.classList.toggle("classic-theme");
+    const isClassic = document.body.classList.contains("classic-theme");
+    localStorage.setItem("theme", isClassic ? "classic" : "modern");
+    
+    // Change toggle button icon/text
+    if (isClassic) {
+      btnThemeToggle.innerHTML = `
+        <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24">
+          <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41z"/>
+        </svg>
+      `;
+    } else {
+      btnThemeToggle.innerHTML = `
+        <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24">
+          <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+        </svg>
+      `;
+    }
+  }
+
+  // INITIAL SETUP & LISTENERS
+  btnStart.addEventListener("click", startScanner);
+  btnShare.addEventListener("click", encodeShare);
+  btnThemeToggle.addEventListener("click", toggleTheme);
+
+  searchInput.addEventListener("input", (e) => {
+    state.searchQuery = e.target.value;
+    renderTable();
+  });
+
+  timeoutSlider.addEventListener("input", (e) => {
+    state.timeout = e.target.value;
+    timeoutVal.textContent = `${state.timeout}s`;
+  });
+
+  concurrencySlider.addEventListener("input", (e) => {
+    state.concurrency = e.target.value;
+    concurrencyVal.textContent = state.concurrency;
+  });
+
+  categoryTabs.addEventListener("click", (e) => {
+    if (e.target.classList.contains("tab-btn")) {
+      categoryTabs.querySelectorAll(".tab-btn").forEach(t => t.classList.remove("active"));
+      e.target.classList.add("active");
+      state.currentCategory = e.target.getAttribute("data-category");
+      renderTable();
+    }
+  });
+
+  // INIT
+  async function init() {
+    // Check saved theme preference
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "classic") {
+      document.body.classList.add("classic-theme");
+      toggleTheme(); // sync icons
+      document.body.classList.add("classic-theme"); // force classic state
+    }
+
+    if (tryHandleShare()) {
+      return; // Loaded archival share results, halt standard scanning init
+    }
+
+    updateCategoryTabCounts();
+    renderTable();
+    
+    // Enable start buttons
+    btnStart.disabled = false;
+
+    // Fetch user ASN and populate log
+    logPush("INFO", null, "Дашборд успешно запущен и готов к работе.");
+    await fetchAsn();
+  }
+
+  window.onload = init;
+</script>
+
+</body>
+</html>

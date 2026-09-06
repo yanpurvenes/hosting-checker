@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RU :: TCP 16-20 DPI & Hosting Checker</title>
-  <meta name="description" content="Инструмент для проверки доступности хостингов, VPS и CDN с оригинальными тестами TCP 16-20 DPI напрямую из браузера.">
+  <meta name="description" content="Инструмент для проверки доступности зарубежных и российских хостингов, VPS, CDN и популярных сервисов методами TCP 16-20 DPI напрямую из браузера.">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,10 +16,10 @@
     :root {
       /* Dark Theme (Default Modern) */
       --bg-base: #060913;
-      --bg-surface: rgba(15, 22, 42, 0.65);
-      --bg-card: rgba(30, 41, 59, 0.45);
-      --border-glow: rgba(99, 102, 241, 0.15);
-      --border-color: rgba(255, 255, 255, 0.06);
+      --bg-surface: rgba(15, 22, 42, 0.75);
+      --bg-card: rgba(30, 41, 59, 0.55);
+      --border-glow: rgba(99, 102, 241, 0.2);
+      --border-color: rgba(255, 255, 255, 0.08);
       
       --text-primary: #f8fafc;
       --text-secondary: #94a3b8;
@@ -33,13 +33,13 @@
       
       --btn-start-bg: #ff008b;
       --btn-start-hover: #d40074;
-      --btn-share-bg: #1a1a1a;
-      --btn-share-hover: #333333;
+      --btn-secondary-bg: rgba(255, 255, 255, 0.07);
+      --btn-secondary-hover: rgba(255, 255, 255, 0.12);
       
       --radius-lg: 16px;
       --radius-md: 12px;
       --radius-sm: 8px;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       --font-base: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: 'Fira Code', 'Courier New', Courier, monospace;
     }
@@ -50,17 +50,20 @@
       --bg-surface: #ffffff;
       --bg-card: #ffffff;
       --border-glow: rgba(0, 0, 0, 0.05);
-      --border-color: #e0e0e0;
+      --border-color: #dee2e6;
       
-      --text-primary: #333333;
-      --text-secondary: #555555;
-      --text-muted: #777777;
+      --text-primary: #212529;
+      --text-secondary: #495057;
+      --text-muted: #6c757d;
       
       --clr-success: #28a745;
       --clr-danger: #dc3545;
       --clr-warning: #fd7e14;
       --clr-info: #007bff;
       --clr-accent: #6f42c1;
+
+      --btn-secondary-bg: #e9ecef;
+      --btn-secondary-hover: #ced4da;
       
       --radius-lg: 8px;
       --radius-md: 6px;
@@ -88,13 +91,14 @@
     /* GRADIENT BG FOR DARK MODE ONLY */
     body:not(.classic-theme) {
       background-image: 
-        radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.06) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 40%);
+        radial-gradient(circle at 10% 15%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(255, 0, 139, 0.03) 0%, transparent 60%);
       background-attachment: fixed;
     }
 
     .app-container {
-      max-width: 1200px;
+      max-width: 1240px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
@@ -112,9 +116,9 @@
     }
 
     body:not(.classic-theme) .glass-panel {
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
     }
 
     /* HEADER & BRANDING */
@@ -126,34 +130,48 @@
       gap: 1rem;
       border-bottom: 1px solid var(--border-color);
       padding-bottom: 20px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .brand-group {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .logo-badge {
-      background: linear-gradient(135deg, var(--clr-info), var(--clr-accent));
-      width: 42px;
-      height: 42px;
+      background: linear-gradient(135deg, #ff008b, var(--clr-accent));
+      width: 44px;
+      height: 44px;
       border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
       font-weight: bold;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       font-family: 'Space Grotesk', sans-serif;
+      box-shadow: 0 4px 12px rgba(255, 0, 139, 0.3);
     }
 
     .brand-titles h1 {
-      font-size: 1.5rem;
+      font-size: 1.55rem;
       font-weight: 700;
       font-family: 'Space Grotesk', sans-serif;
       letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-titles h1 .version-badge {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--clr-accent);
+      border: 1px solid var(--border-glow);
+      font-weight: 600;
     }
 
     body.classic-theme .brand-titles h1 {
@@ -161,8 +179,14 @@
       color: #1a1a1a;
     }
 
+    body.classic-theme .brand-titles h1 .version-badge {
+      background: #e9ecef;
+      color: #495057;
+      border-color: #ced4da;
+    }
+
     .brand-titles p {
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       color: var(--text-secondary);
     }
 
@@ -170,7 +194,7 @@
     .action-bar {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
@@ -178,15 +202,17 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 10px 20px;
-      font-size: 0.95rem;
+      gap: 6px;
+      padding: 9px 16px;
+      font-size: 0.9rem;
       font-weight: 600;
       border-radius: var(--radius-md);
-      border: 0;
+      border: 1px solid transparent;
       cursor: pointer;
       color: #ffffff;
       transition: var(--transition);
+      white-space: nowrap;
+      user-select: none;
     }
 
     .btn:disabled {
@@ -194,35 +220,49 @@
       cursor: not-allowed;
       transform: none !important;
       box-shadow: none !important;
+      opacity: 0.6;
     }
 
-    #start-btn {
+    .btn-primary {
       background: var(--btn-start-bg);
-      min-width: 130px;
+      min-width: 120px;
     }
 
-    #start-btn:hover:not(:disabled) {
+    .btn-primary:hover:not(:disabled) {
       background: var(--btn-start-hover);
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(255, 0, 139, 0.3);
+      box-shadow: 0 5px 15px rgba(255, 0, 139, 0.35);
     }
 
-    #share-btn {
-      background: var(--btn-share-bg);
-      border: 1px solid var(--border-color);
+    .btn-secondary {
+      background: var(--btn-secondary-bg);
+      border-color: var(--border-color);
+      color: var(--text-primary);
     }
 
-    #share-btn:hover:not(:disabled) {
-      background: var(--btn-share-hover);
-      transform: translateY(-2px);
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--btn-secondary-hover);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
+    }
+
+    body.classic-theme .btn-secondary {
+      background: #f8f9fa;
+      border-color: #ced4da;
+      color: #212529;
+    }
+
+    body.classic-theme .btn-secondary:hover:not(:disabled) {
+      background: #e2e6ea;
+      border-color: #dae0e5;
     }
 
     .theme-toggle-btn {
       background: transparent;
       border: 1px solid var(--border-color);
       color: var(--text-primary);
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: var(--radius-md);
       display: flex;
       align-items: center;
@@ -232,7 +272,7 @@
     }
 
     .theme-toggle-btn:hover {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.08);
       border-color: var(--clr-info);
     }
 
@@ -240,12 +280,178 @@
       background: rgba(0, 0, 0, 0.05);
     }
 
+    /* DROPDOWNS */
+    .dropdown-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 100;
+      min-width: 260px;
+      max-width: calc(100vw - 30px);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      padding: 10px;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    body:not(.classic-theme) .dropdown-menu {
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      background: rgba(15, 22, 42, 0.95);
+    }
+
+    body.classic-theme .dropdown-menu {
+      background: #ffffff;
+      border-color: #ced4da;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    }
+
+    .dropdown-menu.show {
+      display: flex;
+    }
+
+    /* PROVIDERS SELECTOR DROPDOWN */
+    .providers-dropdown-menu {
+      width: 320px;
+      max-height: 420px;
+    }
+
+    .dropdown-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .dropdown-filter-input {
+      width: 100%;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    body.classic-theme .dropdown-filter-input {
+      background: #ffffff;
+      border-color: #ced4da;
+    }
+
+    .dropdown-quick-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+
+    .btn-link {
+      background: none;
+      border: none;
+      color: var(--clr-info);
+      cursor: pointer;
+      font-size: 0.78rem;
+      padding: 2px 4px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+
+    .btn-link:hover {
+      text-decoration: underline;
+    }
+
+    .providers-scroll-list {
+      max-height: 280px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding-right: 4px;
+    }
+
+    .provider-option-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition);
+    }
+
+    .provider-option-label:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    body.classic-theme .provider-option-label:hover {
+      background: #f1f3f5;
+    }
+
+    .provider-option-label input[type="checkbox"] {
+      margin-right: 8px;
+      accent-color: var(--btn-start-bg);
+      cursor: pointer;
+    }
+
+    .provider-count-pill {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+
+    body.classic-theme .provider-count-pill {
+      background: #e9ecef;
+      color: #6c757d;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      font-size: 0.88rem;
+      background: none;
+      border: none;
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      text-align: left;
+      cursor: pointer;
+      transition: var(--transition);
+      width: 100%;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--clr-info);
+    }
+
+    body.classic-theme .dropdown-item:hover {
+      background: #f1f3f5;
+      color: #007bff;
+    }
+
     /* RIPE ASN INFO */
     .asn-banner {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--text-secondary);
-      padding: 8px 12px;
-      background: rgba(255, 255, 255, 0.03);
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.025);
       border-radius: var(--radius-sm);
       border-left: 3px solid var(--clr-info);
       display: flex;
@@ -286,7 +492,7 @@
     .config-group {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.25rem;
       flex-wrap: wrap;
     }
 
@@ -300,7 +506,7 @@
 
     .range-slider {
       -webkit-appearance: none;
-      width: 100px;
+      width: 90px;
       height: 4px;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 2px;
@@ -328,8 +534,14 @@
       gap: 12px;
     }
 
+    .search-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
     .search-bar {
-      width: 100%;
+      flex: 1;
       padding: 10px 16px;
       background: rgba(0, 0, 0, 0.15);
       border: 1px solid var(--border-color);
@@ -352,7 +564,7 @@
 
     .category-tabs {
       display: flex;
-      gap: 4px;
+      gap: 5px;
       overflow-x: auto;
       padding-bottom: 4px;
     }
@@ -362,7 +574,7 @@
       font-size: 0.8rem;
       font-weight: 600;
       background: transparent;
-      border: 0;
+      border: 1px solid transparent;
       color: var(--text-secondary);
       cursor: pointer;
       border-radius: var(--radius-sm);
@@ -372,38 +584,43 @@
 
     .tab-btn:hover {
       color: var(--text-primary);
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.04);
     }
 
     body.classic-theme .tab-btn:hover {
-      background: rgba(0, 0, 0, 0.03);
+      background: rgba(0, 0, 0, 0.04);
     }
 
     .tab-btn.active {
-      background: rgba(59, 130, 246, 0.08);
+      background: rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.3);
       color: var(--clr-info);
     }
 
     body.classic-theme .tab-btn.active {
       background: #007bff;
+      border-color: #007bff;
       color: #ffffff;
     }
 
-    /* CLASSIC TABLE STYLE */
+    /* HOSTS TABLE */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 10px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
     .hosts-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      border: 1px solid var(--border-color);
+      text-align: left;
     }
 
     .hosts-table th,
     .hosts-table td {
-      padding: 10px 15px;
-      text-align: center;
-      font-size: 0.9rem;
+      padding: 10px 14px;
+      font-size: 0.88rem;
       border-bottom: 1px solid var(--border-color);
     }
 
@@ -411,6 +628,14 @@
       background: var(--bg-card);
       color: var(--text-secondary);
       font-weight: 600;
+      text-align: center;
+      font-size: 0.82rem;
+      letter-spacing: 0.3px;
+    }
+
+    .hosts-table th.th-left,
+    .hosts-table td.td-left {
+      text-align: left;
     }
 
     body.classic-theme .hosts-table th {
@@ -429,10 +654,10 @@
     }
 
     body:not(.classic-theme) .hosts-table tbody tr:hover {
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(255, 255, 255, 0.025);
     }
 
-    /* STATUS COLORS */
+    /* STATUS PILLS & BADGES */
     .ok {
       color: var(--clr-success) !important;
       font-weight: 600;
@@ -453,6 +678,58 @@
       font-weight: 500;
     }
 
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .badge-alive-yes {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--clr-success);
+    }
+
+    .badge-alive-no {
+      background: rgba(244, 63, 94, 0.12);
+      color: var(--clr-danger);
+    }
+
+    .badge-alive-unknown {
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--clr-warning);
+    }
+
+    .badge-dpi-ok {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--clr-success);
+    }
+
+    .badge-dpi-bad {
+      background: rgba(244, 63, 94, 0.15);
+      color: var(--clr-danger);
+    }
+
+    .badge-dpi-warn {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--clr-warning);
+    }
+
+    .badge-dpi-skip {
+      background: rgba(100, 116, 139, 0.12);
+      color: var(--text-muted);
+    }
+
+    .reason-tag {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      opacity: 0.85;
+      margin-left: 4px;
+    }
+
     /* MONOSPACE CONSOLE LOG */
     .log-panel {
       display: flex;
@@ -460,8 +737,14 @@
       gap: 8px;
     }
 
+    .log-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     .log-header-title {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--text-secondary);
       text-transform: uppercase;
@@ -474,8 +757,8 @@
       padding: 16px;
       border-radius: var(--radius-md);
       font-family: var(--font-mono);
-      font-size: 0.82rem;
-      max-height: 250px;
+      font-size: 0.8rem;
+      max-height: 240px;
       overflow-y: auto;
       border: 1px solid var(--border-color);
       white-space: pre-wrap;
@@ -488,13 +771,86 @@
       border: 0;
     }
 
+    /* MODAL */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    body.classic-theme .modal-card {
+      background: #ffffff;
+      border-color: #ced4da;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .modal-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.85rem;
+    }
+
+    .modal-input {
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    body.classic-theme .modal-input {
+      background: #ffffff;
+      border-color: #ced4da;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
     /* FOOTER */
     .app-footer {
       font-size: 0.8rem;
       color: var(--text-muted);
       text-align: center;
       margin-top: 1rem;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     .app-footer a {
@@ -517,7 +873,7 @@
       }
       .action-bar {
         width: 100%;
-        justify-content: space-between;
+        justify-content: flex-start;
       }
       .hosts-table th, 
       .hosts-table td {
@@ -543,16 +899,60 @@
       <div class="brand-group">
         <div class="logo-badge">⚡</div>
         <div class="brand-titles">
-          <h1 id="app-title">RU :: TCP 16-20 & Hosting Checker</h1>
-          <p id="app-subtitle">Проверка доступности VPS-хостингов и CDN-сетей методом TCP 16-20</p>
+          <h1 id="app-title">
+            RU :: TCP 16-20 & Hosting Checker
+            <span class="version-badge">v2.4 Pro</span>
+          </h1>
+          <p id="app-subtitle">Проверка доступности VPS-хостингов, CDN и сервисов методами TCP 16-20 из браузера</p>
         </div>
       </div>
       
       <div class="action-bar">
-        <button id="start-btn" class="btn" disabled>🔍 Start</button>
-        <button id="share-btn" class="btn" disabled>🔗 Share</button>
-        <button id="theme-toggle" class="theme-toggle-btn" title="Переключить тему оформления">
-          <!-- Theme Switcher SVG Icon -->
+        <!-- Start / Stop -->
+        <button id="start-btn" class="btn btn-primary" disabled>🔍 Start</button>
+        
+        <!-- Provider multi-select dropdown -->
+        <div class="dropdown-wrapper">
+          <button id="providers-btn" class="btn btn-secondary" title="Выбор провайдеров для тестирования">
+            🏢 Провайдеры <span id="providers-count-badge">(0/0)</span> ▾
+          </button>
+          <div id="providers-menu" class="dropdown-menu providers-dropdown-menu">
+            <div class="dropdown-header">
+              <input type="text" id="provider-filter-input" class="dropdown-filter-input" placeholder="Фильтр по названию...">
+              <div class="dropdown-quick-actions">
+                <button type="button" id="providers-select-all" class="btn-link">Выбрать все</button>
+                <button type="button" id="providers-deselect-all" class="btn-link">Снять все</button>
+              </div>
+            </div>
+            <div id="providers-list" class="providers-scroll-list">
+              <!-- Dynamically filled with checkboxes -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Custom Target -->
+        <button id="add-host-btn" class="btn btn-secondary" title="Добавить пользовательский хост для проверки">
+          ➕ Хост
+        </button>
+
+        <!-- Export Dropdown -->
+        <div class="dropdown-wrapper">
+          <button id="export-dropdown-btn" class="btn btn-secondary" title="Сохранить результаты в файл">
+            💾 Экспорт ▾
+          </button>
+          <div id="export-menu" class="dropdown-menu">
+            <button type="button" id="export-json-btn" class="dropdown-item">📄 Скачать JSON</button>
+            <button type="button" id="export-csv-btn" class="dropdown-item">📊 Скачать CSV</button>
+          </div>
+        </div>
+
+        <!-- Share URL -->
+        <button id="share-btn" class="btn btn-secondary" disabled title="Скопировать ссылку с результатами">
+          🔗 Share
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="theme-toggle" class="theme-toggle-btn" title="Переключить тему оформления (Modern / Classic)">
           <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24">
             <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
           </svg>
@@ -562,7 +962,7 @@
 
     <!-- CLIENT RIPE ASN INFO -->
     <div class="asn-banner" id="asn-banner">
-      <span id="asn">Определение сетевого провайдера...</span>
+      <span id="asn">Определение сетевого провайдера клиента...</span>
       <span id="shareTs"></span>
     </div>
 
@@ -571,7 +971,7 @@
       <div class="config-group">
         <div class="config-item">
           <span>Таймаут:</span>
-          <input type="range" id="timeout-slider" class="range-slider" min="1" max="15" value="10">
+          <input type="range" id="timeout-slider" class="range-slider" min="1" max="20" value="10">
           <span id="timeout-val" style="font-weight:600; color: var(--clr-info);">10s</span>
         </div>
         <div class="config-item">
@@ -580,34 +980,40 @@
           <span id="concurrency-val" style="font-weight:600; color: var(--clr-accent);">6</span>
         </div>
       </div>
-      <div style="font-size:0.8rem; color: var(--text-muted);">
-        Status: <span id="status" class="status-ready ok">Ready ⚡</span>
+      <div style="font-size:0.85rem; color: var(--text-muted); display:flex; align-items:center; gap: 10px;">
+        <span id="progress-text"></span>
+        <span>Статус: <span id="status" class="status-ready ok">Ready ⚡</span></span>
       </div>
     </section>
 
     <!-- SEARCH & FILTER TABS -->
     <section class="filter-wrapper">
-      <input type="text" id="search-input" class="search-bar" placeholder="Быстрый поиск по названию провайдера или домену...">
+      <div class="search-row">
+        <input type="text" id="search-input" class="search-bar" placeholder="Быстрый поиск по названию провайдера, домену или ID...">
+      </div>
       
       <div class="category-tabs" id="category-tabs">
         <button class="tab-btn active" data-category="all">Все ресурсы (0)</button>
+        <button class="tab-btn" data-category="popular-services">Популярные сервисы (0)</button>
+        <button class="tab-btn" data-category="mobile-push">Push-уведомления (0)</button>
         <button class="tab-btn" data-category="foreign-vps">Зарубежные VPS (0)</button>
-        <button class="tab-btn" data-category="rf-roots">С РФ корнями (0)</button>
-        <button class="tab-btn" data-category="infomaniak">Infomaniak (0)</button>
+        <button class="tab-btn" data-category="rf-roots">Хостинги и облака РФ (0)</button>
         <button class="tab-btn" data-category="foreign-cdn">Зарубежные CDN (0)</button>
         <button class="tab-btn" data-category="rf-cdn">Российские CDN (0)</button>
+        <button class="tab-btn" data-category="infomaniak">Infomaniak (0)</button>
+        <button class="tab-btn" data-category="custom" style="display:none;" id="custom-tab">Свои хосты (0)</button>
       </div>
     </section>
 
     <!-- RESULTS TABLE -->
-    <div style="overflow-x: auto; margin-top: 10px;">
+    <div class="table-container">
       <table class="hosts-table" id="results">
         <thead>
           <tr>
-            <th style="width: 12%;">#</th>
-            <th style="text-align: left; width: 48%;">Провайдер / Хост</th>
-            <th style="width: 20%;">Доступен (Alive)</th>
-            <th style="width: 20%;">DPI TCP 16-20</th>
+            <th style="width: 10%;">ID</th>
+            <th class="th-left" style="width: 46%;">Провайдер / Целевой хост</th>
+            <th style="width: 22%;">Доступен (Alive)</th>
+            <th style="width: 22%;">DPI TCP 16-20</th>
           </tr>
         </thead>
         <tbody id="results-tbody">
@@ -620,50 +1026,110 @@
 
   <!-- LOG PANEL -->
   <section class="log-panel">
-    <div class="log-header-title">Диагностический журнал логов</div>
+    <div class="log-header-bar">
+      <div class="log-header-title">Диагностический журнал событий</div>
+      <button id="clear-log-btn" class="btn-link" style="font-size:0.75rem;">Очистить лог</button>
+    </div>
     <pre id="log"></pre>
   </section>
 
+  <!-- MODAL: ADD CUSTOM HOST -->
+  <div id="add-host-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-title">➕ Добавить целевой хост</div>
+      <div class="modal-field">
+        <label for="custom-host-input">Домен или IP-адрес (HTTPS):</label>
+        <input type="text" id="custom-host-input" class="modal-input" placeholder="example.com или sub.domain.org">
+      </div>
+      <div class="modal-field">
+        <label for="custom-provider-input">Название провайдера / сервиса:</label>
+        <input type="text" id="custom-provider-input" class="modal-input" placeholder="Мой VPS / Сервер">
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="modal-cancel-btn" class="btn btn-secondary">Отмена</button>
+        <button type="button" id="modal-submit-btn" class="btn btn-primary">Добавить</button>
+      </div>
+    </div>
+  </div>
+
   <!-- FOOTER -->
   <footer class="app-footer">
-    <p>❗️ В браузерной песочнице TCP-соединения не могут быть принудительно сброшены — повторные тесты могут кэшировать сокеты.</p>
-    <p>Рекомендуется использовать режим инкогнито или сбрасывать сокеты в Chrome по ссылке <a href="chrome://net-internals/#sockets" target="_blank">chrome://net-internals/#sockets</a> для каждого нового теста.</p>
-    <p>Создано на базе исследований <a href="https://github.com/hyperion-cs/dpi-checkers" target="_blank">hyperion-cs/dpi-checkers</a></p>
+    <p>❗️ В браузерной песочнице соединения обслуживаются пулом сокетов Chrome/Safari/Firefox — для чистоты повторных тестов используйте режим Инкогнито или очищайте сокеты в <a href="chrome://net-internals/#sockets" target="_blank">chrome://net-internals/#sockets</a>.</p>
+    <p>Создано на базе исследований и инструментария <a href="https://github.com/hyperion-cs/dpi-checkers" target="_blank">hyperion-cs/dpi-checkers</a></p>
   </footer>
 
 </div>
 
 <script>
-  // DATABASE OF TARGETS
+  // COMPLETE DATABASE OF TARGETS
   const TEST_SUITE = [
-    // --- SUITE V2 ORIGINAL TARGETS ---
-    { id: "US.GH-HPRN", provider: "Self check", country: "🧠", host: "hyperion-cs.github.io", category: "foreign-cdn" },
+    // === 1. POPULAR WEB SERVICES (e2e4401 / default.yaml) ===
+    { id: "SVC.GG-01", provider: "Google", country: "🌐", host: "www.google.com", category: "popular-services" },
+    { id: "SVC.GG-02", provider: "Google", country: "🌐", host: "www.gstatic.com", category: "popular-services" },
+    { id: "SVC.GG-03", provider: "Google", country: "🧠", host: "gemini.google.com", category: "popular-services" },
+    { id: "SVC.YT-01", provider: "YouTube", country: "▶️", host: "www.youtube.com", category: "popular-services" },
+    { id: "SVC.YT-02", provider: "YouTube", country: "🖼️", host: "i.ytimg.com", category: "popular-services" },
+    { id: "SVC.YT-03", provider: "YouTube", country: "⚡", host: "redirector.googlevideo.com", category: "popular-services" },
+    { id: "SVC.X-01", provider: "X (Twitter)", country: "🐦", host: "x.com", category: "popular-services" },
+    { id: "SVC.DC-01", provider: "Discord", country: "💬", host: "discord.com", category: "popular-services" },
+    { id: "SVC.GH-01", provider: "GitHub", country: "🐙", host: "github.com", category: "popular-services" },
+    { id: "SVC.GH-02", provider: "GitHub", country: "🐙", host: "api.github.com", category: "popular-services" },
+    { id: "SVC.GH-03", provider: "GitHub", country: "🐙", host: "raw.githubusercontent.com", category: "popular-services" },
+    { id: "SVC.TG-01", provider: "Telegram", country: "✈️", host: "web.telegram.org", category: "popular-services" },
+    { id: "SVC.TG-02", provider: "Telegram", country: "✈️", host: "api.telegram.org", category: "popular-services" },
+    { id: "SVC.FB-01", provider: "Facebook", country: "👥", host: "www.facebook.com", category: "popular-services" },
+    { id: "SVC.WA-01", provider: "WhatsApp", country: "🟢", host: "web.whatsapp.com", category: "popular-services" },
+    { id: "SVC.IG-01", provider: "Instagram", country: "📷", host: "www.instagram.com", category: "popular-services" },
+    { id: "SVC.LI-01", provider: "LinkedIn", country: "💼", host: "www.linkedin.com", category: "popular-services" },
+    { id: "SVC.YA-01", provider: "Yandex Web", country: "🇷🇺", host: "ya.ru", category: "popular-services" },
+    { id: "SVC.VK-01", provider: "VK", country: "🇷🇺", host: "vk.ru", category: "popular-services" },
+    { id: "SVC.GSU-01", provider: "Gosuslugi", country: "🇷🇺", host: "www.gosuslugi.ru", category: "popular-services" },
+
+    // === 2. MOBILE PUSH NOTIFICATION PROVIDERS (31dc795 / default.yaml) ===
+    { id: "PUSH.FCM-01", provider: "Google FCM / Push", country: "🔔", host: "fcm.googleapis.com", category: "mobile-push" },
+    { id: "PUSH.GACC-01", provider: "Google FCM / Push", country: "🔔", host: "accounts.google.com", category: "mobile-push" },
+    { id: "PUSH.GIID-01", provider: "Google FCM / Push", country: "🔔", host: "iid.googleapis.com", category: "mobile-push" },
+    { id: "PUSH.MTK-01", provider: "Google FCM / Push", country: "🔔", host: "mtalk.google.com", category: "mobile-push" },
+    { id: "PUSH.MTK-02", provider: "Google FCM / Push", country: "🔔", host: "mtalk4.google.com", category: "mobile-push" },
+    { id: "PUSH.MTK-03", provider: "Google FCM / Push", country: "🔔", host: "mtalk-staging.google.com", category: "mobile-push" },
+    { id: "PUSH.MTK-04", provider: "Google FCM / Push", country: "🔔", host: "mtalk-dev.google.com", category: "mobile-push" },
+    { id: "PUSH.MTK-05", provider: "Google FCM / Push", country: "🔔", host: "alt1-mtalk.google.com", category: "mobile-push" },
+    { id: "PUSH.GAND-01", provider: "Google FCM / Push", country: "🔔", host: "android.apis.google.com", category: "mobile-push" },
+    { id: "PUSH.GPRV-01", provider: "Google FCM / Push", country: "🔔", host: "device-provisioning.googleapis.com", category: "mobile-push" },
+    { id: "PUSH.GFIR-01", provider: "Google FCM / Push", country: "🔔", host: "firebaseinstallations.googleapis.com", category: "mobile-push" },
+    { id: "PUSH.APN-01", provider: "Apple APNs", country: "🍎", host: "api.push.apple.com", category: "mobile-push" },
+    { id: "PUSH.APN-02", provider: "Apple APNs", country: "🍎", host: "api.development.push.apple.com", category: "mobile-push" },
+
+    // === 3. FOREIGN CDN (suite.v2.json) ===
+    { id: "US.GH-HPRN", provider: "GitHub Pages", country: "🧠", host: "hyperion-cs.github.io", category: "foreign-cdn" },
     { id: "PL.AKM-01", provider: "Akamai", country: "🇵🇱", host: "www.mobil.com.se", category: "foreign-cdn" },
     { id: "SE.AKM-01", provider: "Akamai", country: "🇸🇪", host: "cdn.apple-mapkit.com", category: "foreign-cdn" },
-    { id: "DE.AWS-01", provider: "AWS", country: "🇩🇪", host: "amplifon.com", category: "foreign-vps" },
-    { id: "US.AWS-01", provider: "AWS", country: "🇺🇸", host: "marsh.com", category: "foreign-vps" },
     { id: "US.CDN77-01", provider: "CDN77", country: "🇺🇸", host: "cdn.eso.org", category: "foreign-cdn" },
     { id: "CA.CF-01", provider: "Cloudflare", country: "🇨🇦", host: "go.coveo.com", category: "foreign-cdn" },
     { id: "CA.CF-02", provider: "Cloudflare", country: "🇨🇦", host: "justice.gov", category: "foreign-cdn" },
     { id: "US.CF-01", provider: "Cloudflare", country: "🇺🇸", host: "img.wzstats.gg", category: "foreign-cdn" },
     { id: "US.CF-02", provider: "Cloudflare", country: "🇺🇸", host: "esm.sh", category: "foreign-cdn" },
+    { id: "CA.FST-01", provider: "Fastly", country: "🇨🇦", host: "ssl.p.jwpcdn.com", category: "foreign-cdn" },
+    { id: "US.FST-01", provider: "Fastly", country: "🇺🇸", host: "www.jetblue.com", category: "foreign-cdn" },
+    { id: "LU.GCORE-01", provider: "Gcore", country: "🇱🇺", host: "gcore.com", category: "foreign-cdn" },
+
+    // === 4. FOREIGN VPS PROVIDERS (suite.v2.json + Top VPS) ===
+    { id: "DE.AWS-01", provider: "AWS", country: "🇩🇪", host: "amplifon.com", category: "foreign-vps" },
+    { id: "US.AWS-01", provider: "AWS", country: "🇺🇸", host: "optout.aboutads.info", category: "foreign-vps" }, // commit upstream fix
     { id: "FR.CNTB-01", provider: "Contabo", country: "🇫🇷", host: "antoniotartaglia.it", category: "foreign-vps" },
     { id: "FR.CNTB-02", provider: "Contabo", country: "🇫🇷", host: "status.moow.info", category: "foreign-vps" },
     { id: "DE.DO-01", provider: "DigitalOcean", country: "🇩🇪", host: "ui-arts.com", category: "foreign-vps" },
-    { id: "UK.DO-01", provider: "DigitalOcean", country: "🇬🇧", host: "kingswoodssweets.co.uk", category: "foreign-vps" },
+    { id: "UK.DO-01", provider: "DigitalOcean", country: "🇬🇧", host: "app.thecuriositylibrary.com", category: "foreign-vps" }, // commit e2c1801 fix
     { id: "UK.DO-02", provider: "DigitalOcean", country: "🇬🇧", host: "admin.survey54.com", category: "foreign-vps" },
-    { id: "CA.FST-01", provider: "Fastly", country: "🇨🇦", host: "ssl.p.jwpcdn.com", category: "foreign-cdn" },
-    { id: "US.FST-01", provider: "Fastly", country: "🇺🇸", host: "www.jetblue.com", category: "foreign-cdn" },
     { id: "US.FTBVM-01", provider: "FT/BuyVM", country: "🇺🇸", host: "buyvm.net", category: "foreign-vps" },
     { id: "US.FTBVM-02", provider: "FT/BuyVM", country: "🇺🇸", host: "dmvideo.download", category: "foreign-vps" },
-    { id: "LU.GCORE-01", provider: "Gcore", country: "🇱🇺", host: "gcore.com", category: "foreign-cdn" },
     { id: "US.GC-01", provider: "Google Cloud", country: "🇺🇸", host: "api.usercentrics.eu", category: "foreign-vps" },
     { id: "US.GC-02", provider: "Google Cloud", country: "🇺🇸", host: "widgets.reputation.com", category: "foreign-vps" },
     { id: "DE.HE-01", provider: "Hetzner", country: "🇩🇪", host: "king.hr", category: "foreign-vps" },
     { id: "DE.HE-02", provider: "Hetzner", country: "🇩🇪", host: "mail.server.apaone.com", category: "foreign-vps" },
     { id: "FI.HE-01", provider: "Hetzner", country: "🇫🇮", host: "nioges.com", category: "foreign-vps" },
     { id: "FI.HE-02", provider: "Hetzner", country: "🇫🇮", host: "5fd8bdae.nip.io", category: "foreign-vps" },
-    { id: "FI.HE-03", provider: "Hetzner", country: "🇫🇮", host: "5fd8bca5.nip.io", category: "foreign-vps" },
+    { id: "FI.HE-03", provider: "Hetzner", country: "🇫🇮", host: "net4u.de", category: "foreign-vps" }, // commit 1eaea5a fix
     { id: "US.MBCOM-01", provider: "Melbicom", country: "🇺🇸", host: "elecane.com", category: "foreign-vps" },
     { id: "NL.MS-01", provider: "Microsoft/Azure", country: "🇳🇱", host: "store.takeda.com", category: "foreign-vps" },
     { id: "ES.OR-01", provider: "Oracle", country: "🇪🇸", host: "sh00065.hostgator.com", category: "foreign-vps" },
@@ -673,18 +1139,32 @@
     { id: "NL.SW-01", provider: "Scaleway", country: "🇳🇱", host: "www.velivole.fr", category: "foreign-vps" },
     { id: "DE.VLTR-01", provider: "Vultr", country: "🇩🇪", host: "askit-app.de", category: "foreign-vps" },
     { id: "US.VLTR-01", provider: "Vultr", country: "🇺🇸", host: "us.rudder.qntmnet.com", category: "foreign-vps" },
-
-    // --- NETCUP ---
     { id: "DE.NCP-01", provider: "Netcup", country: "🇩🇪", host: "www.netcup.de", category: "foreign-vps" },
     { id: "DE.NCP-02", provider: "Netcup", country: "🇩🇪", host: "www.netcup.eu", category: "foreign-vps" },
+    { id: "FI.UPC-01", provider: "UpCloud", country: "🇫🇮", host: "upcloud.com", category: "foreign-vps" },
+    { id: "LT.HST-01", provider: "Hostinger", country: "🇱🇹", host: "www.hostinger.com", category: "foreign-vps" },
+    { id: "US.NMC-01", provider: "Namecheap", country: "🇺🇸", host: "www.namecheap.com", category: "foreign-vps" },
+    { id: "US.GDD-01", provider: "GoDaddy", country: "🇺🇸", host: "www.godaddy.com", category: "foreign-vps" },
+    { id: "US.A2H-01", provider: "A2 Hosting", country: "🇺🇸", host: "www.a2hosting.com", category: "foreign-vps" },
+    { id: "BG.STG-01", provider: "SiteGround", country: "🇧🇬", host: "www.siteground.com", category: "foreign-vps" },
+    { id: "US.BLH-01", provider: "Bluehost", country: "🇺🇸", host: "www.bluehost.com", category: "foreign-vps" },
+    { id: "US.DMH-01", provider: "DreamHost", country: "🇺🇸", host: "www.dreamhost.com", category: "foreign-vps" },
+    { id: "US.FCM-01", provider: "FastComet", country: "🇺🇸", host: "www.fastcomet.com", category: "foreign-vps" },
+    { id: "DE.ION-01", provider: "IONOS", country: "🇩🇪", host: "www.ionos.com", category: "foreign-vps" },
+    { id: "US.KMT-01", provider: "Kamatera", country: "🇺🇸", host: "www.kamatera.com", category: "foreign-vps" },
+    { id: "US.RMN-01", provider: "RamNode", country: "🇺🇸", host: "www.ramnode.com", category: "foreign-vps" },
+    { id: "US.HWD-01", provider: "Hostwinds", country: "🇺🇸", host: "www.hostwinds.com", category: "foreign-vps" },
+    { id: "US.ITS-01", provider: "InterServer", country: "🇺🇸", host: "www.interserver.net", category: "foreign-vps" },
+    { id: "US.LQW-01", provider: "Liquid Web", country: "🇺🇸", host: "www.liquidweb.com", category: "foreign-vps" },
+    { id: "NL.HKG-01", provider: "HostKey Global", country: "🇳🇱", host: "hostkey.com", category: "foreign-vps" },
+    { id: "US.IMH-01", provider: "InMotion Hosting", country: "🇺🇸", host: "www.inmotionhosting.com", category: "foreign-vps" },
+    { id: "LT.HTS-01", provider: "Hostens", country: "🇱🇹", host: "www.hostens.com", category: "foreign-vps" },
+    { id: "US.GGK-01", provider: "GreenGeeks", country: "🇺🇸", host: "www.greengeeks.com", category: "foreign-vps" },
 
-    // --- INFOMANIAK ---
+    // === 5. INFOMANIAK ===
     { id: "CH.INF-01", provider: "Infomaniak", country: "🇨🇭", host: "www.infomaniak.com", category: "infomaniak" },
 
-    // --- UPCLOUD ---
-    { id: "FI.UPC-01", provider: "UpCloud", country: "🇫🇮", host: "upcloud.com", category: "foreign-vps" },
-
-    // --- RUSSIAN ROOT HOSTINGS (20 PROVIDERS) ---
+    // === 6. RUSSIAN ROOT HOSTINGS & CLOUDS (expanded 6cf533b / PRs #90, #91, #96) ===
     { id: "RU.SEL-01", provider: "Selectel", country: "🇷🇺", host: "selectel.ru", category: "rf-roots" },
     { id: "RU.RVD-01", provider: "RuVDS", country: "🇷🇺", host: "ruvds.com", category: "rf-roots" },
     { id: "RU.FVD-01", provider: "FirstVDS", country: "🇷🇺", host: "firstvds.ru", category: "rf-roots" },
@@ -705,28 +1185,21 @@
     { id: "RU.UVD-01", provider: "UltraVDS", country: "🇷🇺", host: "ultravds.com", category: "rf-roots" },
     { id: "RU.MCH-01", provider: "Макхост", country: "🇷🇺", host: "mchost.ru", category: "rf-roots" },
     { id: "RU.EBT-01", provider: "Евробайт", country: "🇷🇺", host: "eurobyte.ru", category: "rf-roots" },
+    { id: "RU.YND-CLD", provider: "Yandex Cloud", country: "🇷🇺", host: "cloud.yandex.ru", category: "rf-roots" },
+    { id: "RU.CLD-01", provider: "Cloud.ru", country: "🇷🇺", host: "cloud.ru", category: "rf-roots" },
+    { id: "RU.VK-CLD", provider: "VK Cloud", country: "🇷🇺", host: "cloud.vk.com", category: "rf-roots" },
+    { id: "RU.RTC-01", provider: "Rostelecom / DataLine", country: "🇷🇺", host: "dtln.ru", category: "rf-roots" },
+    { id: "RU.MTS-CLD", provider: "MTS Cloud / MWS", country: "🇷🇺", host: "cloud.mts.ru", category: "rf-roots" },
+    { id: "RU.SLN-01", provider: "Softline Cloud", country: "🇷🇺", host: "softline.com", category: "rf-roots" },
+    { id: "RU.IHC-01", provider: "IHC.ru", country: "🇷🇺", host: "ihc.ru", category: "rf-roots" },
+    { id: "RU.CTL-01", provider: "Contell", country: "🇷🇺", host: "contell.ru", category: "rf-roots" },
+    { id: "RU.NTK-01", provider: "Netrack / Start2", country: "🇷🇺", host: "start2.ru", category: "rf-roots" },
+    { id: "RU.FLN-01", provider: "Filanco / DataHouse", country: "🇷🇺", host: "datahouse.ru", category: "rf-roots" },
+    { id: "RU.DDG-01", provider: "DDoS-Guard", country: "🇷🇺", host: "ddos-guard.net", category: "rf-roots" },
+    { id: "RU.LND-01", provider: "LandVPS", country: "🇷🇺", host: "landvps.ru", category: "rf-roots" },
+    { id: "RU.RFX-01", provider: "RuFox", country: "🇷🇺", host: "rufox.ru", category: "rf-roots" },
 
-    // --- OTHER TOP VPS PROVIDERS (TO FILL OUT TOP 30 IMPO) ---
-    { id: "LT.HST-01", provider: "Hostinger", country: "🇱🇹", host: "www.hostinger.com", category: "foreign-vps" },
-    { id: "US.NMC-01", provider: "Namecheap", country: "🇺🇸", host: "www.namecheap.com", category: "foreign-vps" },
-    { id: "US.GDD-01", provider: "GoDaddy", country: "🇺🇸", host: "www.godaddy.com", category: "foreign-vps" },
-    { id: "US.A2H-01", provider: "A2 Hosting", country: "🇺🇸", host: "www.a2hosting.com", category: "foreign-vps" },
-    { id: "BG.STG-01", provider: "SiteGround", country: "🇧🇬", host: "www.siteground.com", category: "foreign-vps" },
-    { id: "US.BLH-01", provider: "Bluehost", country: "🇺🇸", host: "www.bluehost.com", category: "foreign-vps" },
-    { id: "US.DMH-01", provider: "DreamHost", country: "🇺🇸", host: "www.dreamhost.com", category: "foreign-vps" },
-    { id: "US.FCM-01", provider: "FastComet", country: "🇺🇸", host: "www.fastcomet.com", category: "foreign-vps" },
-    { id: "DE.ION-01", provider: "IONOS", country: "🇩🇪", host: "www.ionos.com", category: "foreign-vps" },
-    { id: "US.KMT-01", provider: "Kamatera", country: "🇺🇸", host: "www.kamatera.com", category: "foreign-vps" },
-    { id: "US.RMN-01", provider: "RamNode", country: "🇺🇸", host: "www.ramnode.com", category: "foreign-vps" },
-    { id: "US.HWD-01", provider: "Hostwinds", country: "🇺🇸", host: "www.hostwinds.com", category: "foreign-vps" },
-    { id: "US.ITS-01", provider: "InterServer", country: "🇺🇸", host: "www.interserver.net", category: "foreign-vps" },
-    { id: "US.LQW-01", provider: "Liquid Web", country: "🇺🇸", host: "www.liquidweb.com", category: "foreign-vps" },
-    { id: "NL.HKG-01", provider: "HostKey Global", country: "🇳🇱", host: "hostkey.com", category: "foreign-vps" },
-    { id: "US.IMH-01", provider: "InMotion Hosting", country: "🇺🇸", host: "www.inmotionhosting.com", category: "foreign-vps" },
-    { id: "LT.HTS-01", provider: "Hostens", country: "🇱🇹", host: "www.hostens.com", category: "foreign-vps" },
-    { id: "US.GGK-01", provider: "GreenGeeks", country: "🇺🇸", host: "www.greengeeks.com", category: "foreign-vps" },
-
-    // --- RF CDN ---
+    // === 7. RUSSIAN CDN ===
     { id: "RU.YND-01", provider: "Yandex CDN", country: "🇷🇺", host: "yastatic.net", category: "rf-cdn" },
     { id: "RU.VK-01", provider: "VK CDN", country: "🇷🇺", host: "sun9-1.userapi.com", category: "rf-cdn" },
     { id: "RU.NGX-01", provider: "Ngenix", country: "🇷🇺", host: "www.ngenix.net", category: "rf-cdn" },
@@ -753,21 +1226,41 @@
 
   // APP STATE
   let state = {
-    results: {}, // id -> { alive, dpi, latency, timestamp }
+    results: {}, // id -> { alive, reason, dpi, latency, timestamp }
     isRunning: false,
     timeout: 10,
     concurrency: 6,
     currentCategory: "all",
     searchQuery: "",
     clientAsn: 0,
+    clientHolder: "",
+    clientCountry: "",
+    clientCity: "",
     queue: [],
-    activeWorkers: 0
+    activeWorkers: 0,
+    totalToScan: 0,
+    completedScan: 0,
+    selectedProviders: new Set() // Set of selected provider names
   };
 
   // DOM ELEMENTS
   const btnStart = document.getElementById("start-btn");
   const btnShare = document.getElementById("share-btn");
   const btnThemeToggle = document.getElementById("theme-toggle");
+  const btnAddHost = document.getElementById("add-host-btn");
+  const btnProviders = document.getElementById("providers-btn");
+  const providersMenu = document.getElementById("providers-menu");
+  const providersList = document.getElementById("providers-list");
+  const providerFilterInput = document.getElementById("provider-filter-input");
+  const btnProvidersSelectAll = document.getElementById("providers-select-all");
+  const btnProvidersDeselectAll = document.getElementById("providers-deselect-all");
+  const providersCountBadge = document.getElementById("providers-count-badge");
+  
+  const btnExportDropdown = document.getElementById("export-dropdown-btn");
+  const exportMenu = document.getElementById("export-menu");
+  const btnExportJson = document.getElementById("export-json-btn");
+  const btnExportCsv = document.getElementById("export-csv-btn");
+
   const searchInput = document.getElementById("search-input");
   const timeoutSlider = document.getElementById("timeout-slider");
   const timeoutVal = document.getElementById("timeout-val");
@@ -776,9 +1269,19 @@
   const categoryTabs = document.getElementById("category-tabs");
   const resultsTbody = document.getElementById("results-tbody");
   const logEl = document.getElementById("log");
+  const clearLogBtn = document.getElementById("clear-log-btn");
   const asnEl = document.getElementById("asn");
   const shareTsEl = document.getElementById("shareTs");
   const statusEl = document.getElementById("status");
+  const progressTextEl = document.getElementById("progress-text");
+  const customTab = document.getElementById("custom-tab");
+
+  // Modal elements
+  const addHostModal = document.getElementById("add-host-modal");
+  const customHostInput = document.getElementById("custom-host-input");
+  const customProviderInput = document.getElementById("custom-provider-input");
+  const modalCancelBtn = document.getElementById("modal-cancel-btn");
+  const modalSubmitBtn = document.getElementById("modal-submit-btn");
 
   // CONSOLE LOGGER
   function logPush(level, prefix, msg) {
@@ -816,39 +1319,113 @@
     keepalive: false
   });
 
+  // INITIALIZE SELECTED PROVIDERS
+  function initProviders() {
+    const uniqueProviders = [...new Set(TEST_SUITE.map(p => p.provider))].sort();
+    uniqueProviders.forEach(pName => state.selectedProviders.add(pName));
+    renderProvidersList();
+    updateProvidersBadge();
+  }
+
+  function renderProvidersList() {
+    providersList.innerHTML = "";
+    const filter = providerFilterInput.value.toLowerCase();
+    const uniqueProviders = [...new Set(TEST_SUITE.map(p => p.provider))].sort();
+
+    uniqueProviders.forEach(pName => {
+      if (filter && !pName.toLowerCase().includes(filter)) return;
+      const count = TEST_SUITE.filter(x => x.provider === pName).length;
+      const isChecked = state.selectedProviders.has(pName);
+
+      const label = document.createElement("label");
+      label.className = "provider-option-label";
+
+      const leftSpan = document.createElement("span");
+      leftSpan.style.display = "flex";
+      leftSpan.style.alignItems = "center";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = pName;
+      checkbox.checked = isChecked;
+
+      checkbox.addEventListener("change", (e) => {
+        if (e.target.checked) {
+          state.selectedProviders.add(pName);
+        } else {
+          state.selectedProviders.delete(pName);
+        }
+        updateProvidersBadge();
+        updateCategoryTabCounts();
+        renderTable();
+      });
+
+      leftSpan.appendChild(checkbox);
+      leftSpan.appendChild(document.createTextNode(pName));
+
+      const countPill = document.createElement("span");
+      countPill.className = "provider-count-pill";
+      countPill.textContent = count;
+
+      label.appendChild(leftSpan);
+      label.appendChild(countPill);
+      providersList.appendChild(label);
+    });
+  }
+
+  function updateProvidersBadge() {
+    const totalProviders = new Set(TEST_SUITE.map(p => p.provider)).size;
+    const selectedCount = state.selectedProviders.size;
+    providersCountBadge.textContent = `(${selectedCount}/${totalProviders})`;
+  }
+
   // FILTER LOGIC
   function getFilteredSuite() {
     return TEST_SUITE.filter(p => {
+      const isProviderSelected = state.selectedProviders.has(p.provider);
       const matchesCategory = state.currentCategory === "all" || p.category === state.currentCategory;
-      const matchesSearch = p.provider.toLowerCase().includes(state.searchQuery.toLowerCase()) || 
-                           p.host.toLowerCase().includes(state.searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
+      const q = state.searchQuery.toLowerCase();
+      const matchesSearch = !q || p.provider.toLowerCase().includes(q) || 
+                                  p.host.toLowerCase().includes(q) ||
+                                  p.id.toLowerCase().includes(q);
+      return isProviderSelected && matchesCategory && matchesSearch;
     });
   }
 
   // UPDATE TAB COUNTS
   function updateCategoryTabCounts() {
     const tabs = categoryTabs.querySelectorAll(".tab-btn");
+    let hasCustom = false;
+
     tabs.forEach(tab => {
       const cat = tab.getAttribute("data-category");
       let count = 0;
       if (cat === "all") {
-        count = TEST_SUITE.length;
+        count = TEST_SUITE.filter(p => state.selectedProviders.has(p.provider)).length;
       } else {
-        count = TEST_SUITE.filter(p => p.category === cat).length;
+        count = TEST_SUITE.filter(p => p.category === cat && state.selectedProviders.has(p.provider)).length;
+      }
+
+      if (cat === "custom" && count > 0) {
+        hasCustom = true;
       }
       
       let name = "";
       switch(cat) {
         case "all": name = "Все ресурсы"; break;
+        case "popular-services": name = "Популярные сервисы"; break;
+        case "mobile-push": name = "Push-уведомления"; break;
         case "foreign-vps": name = "Зарубежные VPS"; break;
-        case "rf-roots": name = "С РФ корнями"; break;
-        case "infomaniak": name = "Infomaniak"; break;
+        case "rf-roots": name = "Хостинги и облака РФ"; break;
         case "foreign-cdn": name = "Зарубежные CDN"; break;
         case "rf-cdn": name = "Российские CDN"; break;
+        case "infomaniak": name = "Infomaniak"; break;
+        case "custom": name = "Свои хосты"; break;
       }
       tab.textContent = `${name} (${count})`;
     });
+
+    customTab.style.display = hasCustom ? "inline-block" : "none";
   }
 
   // RENDER TABLE ROWS
@@ -857,7 +1434,7 @@
     resultsTbody.innerHTML = "";
 
     if (filtered.length === 0) {
-      resultsTbody.innerHTML = `<tr><td colspan="4" style="color: var(--text-muted); padding: 2rem;">Ресурсы не найдены</td></tr>`;
+      resultsTbody.innerHTML = `<tr><td colspan="4" style="color: var(--text-muted); text-align: center; padding: 2.5rem;">Ресурсы не найдены по текущим фильтрам или провайдеры отключены в меню.</td></tr>`;
       return;
     }
 
@@ -867,41 +1444,57 @@
 
       const res = state.results[p.id];
       
-      let idCell = `<td>${p.id}</td>`;
-      let providerCell = `<td style="text-align: left;">${p.country} ${p.provider} <span style="font-size:0.75rem; color:var(--text-muted);">(${p.host})</span></td>`;
+      let idCell = `<td style="font-family: var(--font-mono); font-size: 0.8rem; text-align: center;">${p.id}</td>`;
+      let providerCell = `<td class="td-left">
+        <span style="font-weight:600;">${p.country} ${p.provider}</span>
+        <div style="font-size:0.75rem; color:var(--text-muted); font-family: var(--font-mono); margin-top:2px;">
+          https://${p.host}/
+        </div>
+      </td>`;
       
-      let aliveCell = `<td class="skip">Ожидание</td>`;
-      let dpiCell = `<td class="skip">Ожидание</td>`;
+      let aliveCell = `<td style="text-align: center;"><span class="badge-dpi-skip">Ожидание</span></td>`;
+      let dpiCell = `<td style="text-align: center;"><span class="badge-dpi-skip">Ожидание</span></td>`;
 
       if (res) {
         // Render Alive State
         if (res.alive === "checking") {
-          aliveCell = `<td class="checking-text">Тест... ⏰</td>`;
+          aliveCell = `<td style="text-align: center;"><span class="status-badge checking-text">Тест... ⏰</span></td>`;
         } else if (res.alive === ALIVE_YES) {
-          aliveCell = `<td class="ok">Yes 🟢 <span style="font-size:0.75rem; font-family:var(--font-mono); font-weight:normal;">(${Math.round(res.latency)}ms)</span></td>`;
+          aliveCell = `<td style="text-align: center;">
+            <span class="status-badge badge-alive-yes">Yes 🟢</span>
+            <span class="reason-tag">${Math.round(res.latency)}ms</span>
+          </td>`;
         } else if (res.alive === ALIVE_NO) {
-          aliveCell = `<td class="bad">No 🔴</td>`;
+          let reasonText = res.reason || "Timeout";
+          aliveCell = `<td style="text-align: center;">
+            <span class="status-badge badge-alive-no" title="${reasonText}">No 🔴</span>
+            <span class="reason-tag">${reasonText}</span>
+          </td>`;
         } else {
-          aliveCell = `<td class="skip">Unknown ⚠️</td>`;
+          let reasonText = res.reason || "Unknown";
+          aliveCell = `<td style="text-align: center;">
+            <span class="status-badge badge-alive-unknown" title="${reasonText}">Unknown ⚠️</span>
+            <span class="reason-tag">${reasonText}</span>
+          </td>`;
         }
 
         // Render DPI State
         if (res.dpi === "waiting") {
-          dpiCell = `<td class="skip">Ожидание</td>`;
+          dpiCell = `<td style="text-align: center;"><span class="badge-dpi-skip">Ожидание</span></td>`;
         } else if (res.dpi === "checking") {
-          dpiCell = `<td class="checking-text">Тест... ⏰</td>`;
+          dpiCell = `<td style="text-align: center;"><span class="status-badge checking-text">Тест... ⏰</span></td>`;
         } else if (res.dpi === DPI_METHOD_NOT_DETECTED) {
-          dpiCell = `<td class="ok">No ✅</td>`;
+          dpiCell = `<td style="text-align: center;"><span class="status-badge badge-dpi-ok" title="TCP 16-20 блокировка не обнаружена">No ✅</span></td>`;
         } else if (res.dpi === DPI_METHOD_DETECTED) {
-          dpiCell = `<td class="bad">Detected❗️</td>`;
+          dpiCell = `<td style="text-align: center;"><span class="status-badge badge-dpi-bad" title="Обнаружена фильтрация TCP 16-20 DPI">Detected❗️</span></td>`;
         } else if (res.dpi === DPI_METHOD_PROBABLY) {
-          dpiCell = `<td class="bad" style="opacity: 0.85;">Probably❗️</td>`;
+          dpiCell = `<td style="text-align: center;"><span class="status-badge badge-dpi-bad" style="opacity: 0.85;" title="Вероятная блокировка пакетов">Probably❗️</span></td>`;
         } else if (res.dpi === DPI_METHOD_POSSIBLE) {
-          dpiCell = `<td class="skip" style="color: var(--clr-warning) !important;">Possible ⚠️</td>`;
+          dpiCell = `<td style="text-align: center;"><span class="status-badge badge-dpi-warn" title="Возможная блокировка / сброс">Possible ⚠️</span></td>`;
         } else if (res.dpi === DPI_METHOD_UNLIKELY) {
-          dpiCell = `<td class="skip">Unlikely ⚠️</td>`;
+          dpiCell = `<td style="text-align: center;"><span class="status-badge badge-dpi-skip" title="Сетевая ошибка до проверки">Unlikely ⚠️</span></td>`;
         } else if (res.dpi === "skip") {
-          dpiCell = `<td class="skip">Skip ⚠️</td>`;
+          dpiCell = `<td style="text-align: center;"><span class="status-badge badge-dpi-skip" title="Пропущен из-за недоступности хоста">Skip ⚠️</span></td>`;
         }
       }
 
@@ -955,11 +1548,11 @@
 
   // JOB SCANNER WORKER
   async function scanTarget(p) {
-    const prefix = `DPI checking(#${p.id})`;
+    const prefix = `DPI(#${p.id})`;
     let t0 = performance.now();
 
     // Mark as checking alive
-    state.results[p.id] = { alive: "checking", dpi: "waiting", latency: 0, timestamp: "" };
+    state.results[p.id] = { alive: "checking", reason: "", dpi: "waiting", latency: 0, timestamp: new Date().toISOString() };
     renderTable();
 
     let alive = false;
@@ -967,7 +1560,7 @@
     let rtt = 0;
 
     try {
-      // 1. Perform Alive Check using simple HEAD
+      // 1. Perform Alive Check using HEAD
       const aliveCtrl = new AbortController();
       const aliveTimeoutId = setTimeout(() => aliveCtrl.abort(), state.timeout * 1000);
       const url = `https://${p.host}/`;
@@ -975,19 +1568,28 @@
       clearTimeout(aliveTimeoutId);
       
       rtt = performance.now() - t0;
-      logPush("INFO", prefix, `alived: yes 🟢, reqtime: ${rtt.toFixed(1)} ms`);
+      logPush("INFO", prefix, `alived: yes 🟢, rtt: ${rtt.toFixed(1)} ms`);
       state.results[p.id].alive = ALIVE_YES;
       state.results[p.id].latency = rtt;
+      state.results[p.id].reason = "OK";
       alive = true;
       possibleAlive = true;
     } catch (e) {
       rtt = performance.now() - t0;
       if (e.name === "AbortError") {
-        logPush("INFO", prefix, `alived: no 🔴 (Timeout), reqtime: ${rtt.toFixed(1)} ms`);
+        logPush("WARN", prefix, `alived: no 🔴 (Timeout/Blackhole), time: ${rtt.toFixed(1)} ms`);
         state.results[p.id].alive = ALIVE_NO;
+        state.results[p.id].latency = rtt;
+        state.results[p.id].reason = "Timeout";
       } else {
-        logPush("INFO", prefix, `alived: unknown ⚠️, reqtime: ${rtt.toFixed(1)} ms`);
+        // Classify instant failure vs network failure
+        // Fast error (<500ms) typically indicates RST on SNI ClientHello
+        const isFastRst = rtt < 600;
+        const reason = isFastRst ? "SNI RST" : "Net Error";
+        logPush("WARN", prefix, `alived: unknown ⚠️ (${reason}), time: ${rtt.toFixed(1)} ms`);
         state.results[p.id].alive = ALIVE_UNKNOWN;
+        state.results[p.id].latency = rtt;
+        state.results[p.id].reason = reason;
         possibleAlive = true;
       }
     }
@@ -997,6 +1599,8 @@
     if (!alive && !possibleAlive) {
       state.results[p.id].dpi = "skip";
       renderTable();
+      state.completedScan++;
+      updateProgress();
       return;
     }
 
@@ -1007,9 +1611,11 @@
     // Run Method 1 (Huge Body POST)
     const m1 = await dpiHugeBodyPostMethod(alive, p.host);
     if (m1 === DPI_METHOD_DETECTED) {
-      logPush("INFO", prefix, `tcp 16-20: detected❗️, method: 1 (Huge POST body)`);
+      logPush("ALERT", prefix, `tcp 16-20: detected❗️, method: 1 (Huge POST body)`);
       state.results[p.id].dpi = DPI_METHOD_DETECTED;
       renderTable();
+      state.completedScan++;
+      updateProgress();
       return;
     }
 
@@ -1026,8 +1632,18 @@
       [DPI_METHOD_NOT_DETECTED]: `tcp 16-20: not detected ✅, reqtime: ${(performance.now() - t0).toFixed(1)} ms`,
     };
 
-    logPush("INFO", prefix, logDpiMap[m2]);
+    logPush("INFO", prefix, logDpiMap[m2] || "completed");
     renderTable();
+    state.completedScan++;
+    updateProgress();
+  }
+
+  function updateProgress() {
+    if (state.totalToScan > 0) {
+      progressTextEl.textContent = `[${state.completedScan}/${state.totalToScan}]`;
+    } else {
+      progressTextEl.textContent = "";
+    }
   }
 
   // QUEUE PROCESSING PIPELINE
@@ -1050,21 +1666,32 @@
     statusEl.className = "checking-text";
     statusEl.textContent = "Checking ⏰";
 
-    logEl.textContent = "";
     logPush("INFO", null, "Запуск многопоточного теста доступности ресурсов...");
 
     const targets = getFilteredSuite();
+    if (targets.length === 0) {
+      alert("Нет выбранных ресурсов для запуска. Включите провайдеров в меню '🏢 Провайдеры'.");
+      state.isRunning = false;
+      btnStart.disabled = false;
+      btnStart.textContent = "🔍 Start";
+      statusEl.className = "ok";
+      statusEl.textContent = "Ready ⚡";
+      return;
+    }
+
+    state.totalToScan = targets.length;
+    state.completedScan = 0;
+    updateProgress();
     
-    // Clear previous results
-    state.results = {};
+    // Reset targeted items state
     targets.forEach(t => {
-      state.results[t.id] = { alive: "checking", dpi: "waiting", latency: 0, timestamp: "" };
+      state.results[t.id] = { alive: "checking", reason: "", dpi: "waiting", latency: 0, timestamp: "" };
     });
     renderTable();
 
     // Populate queue and start concurrency workers
     state.queue = [...targets];
-    const workersCount = parseInt(state.concurrency);
+    const workersCount = Math.min(parseInt(state.concurrency), targets.length);
     const workers = [];
 
     for (let i = 0; i < workersCount; i++) {
@@ -1080,7 +1707,8 @@
     
     statusEl.className = "ok";
     statusEl.textContent = "Ready ⚡";
-    logPush("INFO", null, "Проверка полностью завершена.");
+    progressTextEl.textContent = `[Завершено: ${state.completedScan}/${state.totalToScan}]`;
+    logPush("INFO", null, `Проверка полностью завершена. Протестировано ресурсов: ${state.completedScan}`);
   }
 
   // ASN IP DETERMINATION VIA RIPE NCC API
@@ -1092,16 +1720,103 @@
       const asnRes = await fetch(RIPE_API_URL + "prefix-overview/data.json?resource=" + ip);
       const asnData = (await asnRes.json()).data.asns[0];
       state.clientAsn = Number(asnData.asn);
+      state.clientHolder = asnData.holder || "";
       
       const geoRes = await fetch(RIPE_API_URL + "maxmind-geo-lite/data.json?resource=" + ip);
       const geoData = (await geoRes.json()).data.located_resources[0].locations[0];
+      state.clientCountry = geoData.country || "";
+      state.clientCity = geoData.city || "";
       
       asnEl.innerHTML = `ASN: <a href="https://bgp.he.net/AS${asnData.asn}" target="_blank">AS${asnData.asn}</a> (<i>${asnData.holder}</i>)<span class="asn-br"></span>${geoData.country}, ${geoData.city || "—"}`;
     } catch (err) {
       console.error("Fetch ASN err:", err);
-      asnEl.innerHTML = "Не удалось автоматически определить ASN провайдера через API RIPE.";
+      asnEl.innerHTML = "Не удалось автоматически определить ASN клиента через API RIPE (возможно блокируется API RIPE).";
     }
   };
+
+  // EXPORT RESULTS: JSON & CSV
+  function exportToJson() {
+    const exportData = {
+      generator: "hosting-checker v2.4 (hyperion-cs/dpi-checkers engine)",
+      timestamp: new Date().toISOString(),
+      client: {
+        asn: state.clientAsn,
+        holder: state.clientHolder,
+        country: state.clientCountry,
+        city: state.clientCity
+      },
+      results: Object.keys(state.results).map(id => {
+        const res = state.results[id];
+        const target = TEST_SUITE.find(x => x.id === id) || { provider: "Custom", host: "", category: "custom", country: "💡" };
+        return {
+          id: id,
+          provider: target.provider,
+          host: target.host,
+          country: target.country,
+          category: target.category,
+          alive: res.alive,
+          alive_reason: res.reason,
+          latency_ms: Math.round(res.latency),
+          dpi: res.dpi,
+          dpi_text: getDpiText(res.dpi),
+          timestamp: res.timestamp
+        };
+      })
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json;charset=utf-8" });
+    downloadBlob(blob, `hosting-checker-results-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.json`);
+    logPush("INFO", null, "Результаты успешно экспортированы в JSON.");
+  }
+
+  function exportToCsv() {
+    const headers = ["ID", "Provider", "Host", "Country", "Category", "Alive", "Latency_ms", "Reason", "DPI_Status", "Timestamp"];
+    const rows = Object.keys(state.results).map(id => {
+      const res = state.results[id];
+      const target = TEST_SUITE.find(x => x.id === id) || { provider: "Custom", host: "", category: "custom", country: "" };
+      let aliveStr = res.alive === ALIVE_YES ? "YES" : (res.alive === ALIVE_NO ? "NO" : "UNKNOWN");
+      return [
+        `"${id}"`,
+        `"${target.provider}"`,
+        `"${target.host}"`,
+        `"${target.country}"`,
+        `"${target.category}"`,
+        `"${aliveStr}"`,
+        Math.round(res.latency || 0),
+        `"${res.reason || ''}"`,
+        `"${getDpiText(res.dpi)}"`,
+        `"${res.timestamp || ''}"`
+      ].join(";");
+    });
+
+    const csvContent = "\uFEFF" + [headers.join(";"), ...rows].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+    downloadBlob(blob, `hosting-checker-results-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.csv`);
+    logPush("INFO", null, "Результаты успешно экспортированы в CSV.");
+  }
+
+  function getDpiText(dpi) {
+    switch (dpi) {
+      case DPI_METHOD_NOT_DETECTED: return "Not Detected";
+      case DPI_METHOD_DETECTED: return "Detected";
+      case DPI_METHOD_PROBABLY: return "Probably";
+      case DPI_METHOD_POSSIBLE: return "Possible";
+      case DPI_METHOD_UNLIKELY: return "Unlikely";
+      case "skip": return "Skipped";
+      default: return "Pending";
+    }
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 
   // ENCODE SHARE RESULTS TO BASE64 FOR URL SHARING
   async function encodeShare() {
@@ -1115,19 +1830,20 @@
         asn: state.clientAsn,
         items: Object.keys(state.results).map(id => {
           const res = state.results[id];
-          const target = TEST_SUITE.find(x => x.id === id);
+          const target = TEST_SUITE.find(x => x.id === id) || { provider: "Custom", host: "", country: "💡" };
           return {
             id: id,
             provider: target.provider,
+            host: target.host,
             country: target.country,
             alive: res.alive,
+            reason: res.reason,
             dpi: res.dpi,
             latency: res.latency
           };
         })
       };
 
-      // Compact JSON representation encoded using standard base64 url-safe
       const jsonStr = JSON.stringify(shareObj);
       const utf8Bytes = new TextEncoder().encode(jsonStr);
       let binaryStr = "";
@@ -1141,7 +1857,8 @@
 
       const url = `${window.location.origin + window.location.pathname}?share=${b64}`;
       await navigator.clipboard.writeText(url);
-      alert("Ссылка на ваши результаты скопирована в буфер обмена!");
+      alert("Ссылка на сохраненные результаты скопирована в буфер обмена!");
+      logPush("INFO", null, "Ссылка на результаты создана и скопирована.");
     } catch (e) {
       console.error(e);
       alert("Не удалось сгенерировать ссылку для шеринга результатов.");
@@ -1158,7 +1875,6 @@
     if (!shareParam) return false;
 
     try {
-      // Decode URL safe Base64
       let b64 = shareParam.replace(/-/g, "+").replace(/_/g, "/");
       while (b64.length % 4) b64 += "=";
       
@@ -1171,41 +1887,41 @@
       const jsonStr = new TextDecoder().decode(bytes);
       const decoded = JSON.parse(jsonStr);
 
-      // Lock dashboard, show static shared results
-      document.getElementById("app-subtitle").textContent = "Сохраненный отчет проверки доступности";
+      document.getElementById("app-subtitle").textContent = "Сохраненный архивный отчет проверки доступности";
       btnStart.style.display = "none";
       btnShare.style.display = "none";
+      btnAddHost.style.display = "none";
+      btnProviders.parentElement.style.display = "none";
       document.querySelector(".config-row").style.display = "none";
       document.querySelector(".filter-wrapper").style.display = "none";
 
       asnEl.innerHTML = decoded.asn ? `ASN: <a href="https://bgp.he.net/AS${decoded.asn}" target="_blank">AS${decoded.asn}</a> (Архивные результаты)` : "Архивные результаты";
       shareTsEl.textContent = `Дата теста: ${new Date(decoded.ts).toLocaleString()}`;
 
-      // Populate results in table
       resultsTbody.innerHTML = "";
       decoded.items.forEach(v => {
         const row = document.createElement("tr");
-        let aliveHTML = `<td class="skip">Unknown ⚠️</td>`;
+        let aliveHTML = `<td style="text-align: center;"><span class="status-badge badge-alive-unknown">Unknown ⚠️</span></td>`;
         if (v.alive === ALIVE_YES) {
-          aliveHTML = `<td class="ok">Yes 🟢 <span style="font-size:0.75rem; font-family:var(--font-mono);">(${Math.round(v.latency)}ms)</span></td>`;
+          aliveHTML = `<td style="text-align: center;"><span class="status-badge badge-alive-yes">Yes 🟢</span> <span class="reason-tag">${Math.round(v.latency)}ms</span></td>`;
         } else if (v.alive === ALIVE_NO) {
-          aliveHTML = `<td class="bad">No 🔴</td>`;
+          aliveHTML = `<td style="text-align: center;"><span class="status-badge badge-alive-no">No 🔴</span> <span class="reason-tag">${v.reason || 'Timeout'}</span></td>`;
         }
 
-        let dpiHTML = `<td class="skip">Skip ⚠️</td>`;
+        let dpiHTML = `<td style="text-align: center;"><span class="badge-dpi-skip">Skip ⚠️</span></td>`;
         if (v.dpi === DPI_METHOD_NOT_DETECTED) {
-          dpiHTML = `<td class="ok">No ✅</td>`;
+          dpiHTML = `<td style="text-align: center;"><span class="status-badge badge-dpi-ok">No ✅</span></td>`;
         } else if (v.dpi === DPI_METHOD_DETECTED) {
-          dpiHTML = `<td class="bad">Detected❗️</td>`;
+          dpiHTML = `<td style="text-align: center;"><span class="status-badge badge-dpi-bad">Detected❗️</span></td>`;
         } else if (v.dpi === DPI_METHOD_PROBABLY) {
-          dpiHTML = `<td class="bad" style="opacity: 0.85;">Probably❗️</td>`;
+          dpiHTML = `<td style="text-align: center;"><span class="status-badge badge-dpi-bad" style="opacity: 0.85;">Probably❗️</span></td>`;
         } else if (v.dpi === DPI_METHOD_POSSIBLE) {
-          dpiHTML = `<td class="skip" style="color: var(--clr-warning) !important;">Possible ⚠️</td>`;
+          dpiHTML = `<td style="text-align: center;"><span class="status-badge badge-dpi-warn">Possible ⚠️</span></td>`;
         } else if (v.dpi === DPI_METHOD_UNLIKELY) {
-          dpiHTML = `<td class="skip">Unlikely ⚠️</td>`;
+          dpiHTML = `<td style="text-align: center;"><span class="status-badge badge-dpi-skip">Unlikely ⚠️</span></td>`;
         }
 
-        row.innerHTML = `<td>${v.id}</td><td style="text-align: left;">${v.country} ${v.provider}</td>${aliveHTML}${dpiHTML}`;
+        row.innerHTML = `<td style="font-family: var(--font-mono); font-size: 0.8rem; text-align: center;">${v.id}</td><td class="td-left"><b>${v.country} ${v.provider}</b><div style="font-size:0.75rem; color:var(--text-muted); font-family: var(--font-mono);">${v.host ? 'https://' + v.host + '/' : ''}</div></td>${aliveHTML}${dpiHTML}`;
         resultsTbody.appendChild(row);
       });
 
@@ -1218,13 +1934,42 @@
     }
   }
 
+  // URL QUERY PARAMS HANDLER (?host=...&provider=...&timeout=...)
+  function handleUrlQueryParams() {
+    const params = new URLSearchParams(window.location.search);
+    const host = params.get("host");
+    if (host) {
+      const provider = params.get("provider") || "Custom Target";
+      const cleanHost = host.replace(/^https?:\/\//i, "").replace(/\/.*$/, "");
+      const newTarget = {
+        id: `CUSTOM-${TEST_SUITE.filter(x => x.category === "custom").length + 1}`,
+        provider: provider,
+        country: "💡",
+        host: cleanHost,
+        category: "custom"
+      };
+      TEST_SUITE.unshift(newTarget);
+      state.selectedProviders.add(provider);
+      logPush("INFO", null, `Добавлен целевой хост из URL параметров: ${cleanHost} (${provider})`);
+    }
+
+    const timeout = params.get("timeout");
+    if (timeout) {
+      const t = parseInt(timeout);
+      if (t >= 1 && t <= 60) {
+        state.timeout = t;
+        timeoutSlider.value = t;
+        timeoutVal.textContent = `${t}s`;
+      }
+    }
+  }
+
   // THEME SWITCHER
   function toggleTheme() {
     document.body.classList.toggle("classic-theme");
     const isClassic = document.body.classList.contains("classic-theme");
     localStorage.setItem("theme", isClassic ? "classic" : "modern");
     
-    // Change toggle button icon/text
     if (isClassic) {
       btnThemeToggle.innerHTML = `
         <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24">
@@ -1240,16 +1985,119 @@
     }
   }
 
-  // INITIAL SETUP & LISTENERS
+  // EVENT LISTENERS SETUP
   btnStart.addEventListener("click", startScanner);
   btnShare.addEventListener("click", encodeShare);
   btnThemeToggle.addEventListener("click", toggleTheme);
 
+  // Export dropdown
+  btnExportDropdown.addEventListener("click", (e) => {
+    e.stopPropagation();
+    exportMenu.classList.toggle("show");
+    providersMenu.classList.remove("show");
+  });
+
+  btnExportJson.addEventListener("click", () => {
+    exportToJson();
+    exportMenu.classList.remove("show");
+  });
+
+  btnExportCsv.addEventListener("click", () => {
+    exportToCsv();
+    exportMenu.classList.remove("show");
+  });
+
+  // Providers dropdown
+  btnProviders.addEventListener("click", (e) => {
+    e.stopPropagation();
+    providersMenu.classList.toggle("show");
+    exportMenu.classList.remove("show");
+  });
+
+  providerFilterInput.addEventListener("input", () => {
+    renderProvidersList();
+  });
+
+  btnProvidersSelectAll.addEventListener("click", () => {
+    const uniqueProviders = [...new Set(TEST_SUITE.map(p => p.provider))];
+    uniqueProviders.forEach(p => state.selectedProviders.add(p));
+    renderProvidersList();
+    updateProvidersBadge();
+    updateCategoryTabCounts();
+    renderTable();
+  });
+
+  btnProvidersDeselectAll.addEventListener("click", () => {
+    state.selectedProviders.clear();
+    renderProvidersList();
+    updateProvidersBadge();
+    updateCategoryTabCounts();
+    renderTable();
+  });
+
+  // Close menus on click outside
+  document.addEventListener("click", (e) => {
+    if (!providersMenu.contains(e.target) && e.target !== btnProviders) {
+      providersMenu.classList.remove("show");
+    }
+    if (!exportMenu.contains(e.target) && e.target !== btnExportDropdown) {
+      exportMenu.classList.remove("show");
+    }
+  });
+
+  // Modal Custom Host
+  btnAddHost.addEventListener("click", () => {
+    customHostInput.value = "";
+    customProviderInput.value = "";
+    addHostModal.classList.add("show");
+    customHostInput.focus();
+  });
+
+  modalCancelBtn.addEventListener("click", () => {
+    addHostModal.classList.remove("show");
+  });
+
+  modalSubmitBtn.addEventListener("click", () => {
+    const rawHost = customHostInput.value.trim();
+    if (!rawHost) {
+      alert("Укажите домен или IP-адрес.");
+      return;
+    }
+    const cleanHost = rawHost.replace(/^https?:\/\//i, "").replace(/\/.*$/, "");
+    const providerName = customProviderInput.value.trim() || cleanHost;
+    
+    const newTarget = {
+      id: `CUSTOM-${TEST_SUITE.filter(x => x.category === "custom").length + 1}`,
+      provider: providerName,
+      country: "💡",
+      host: cleanHost,
+      category: "custom"
+    };
+
+    TEST_SUITE.unshift(newTarget);
+    state.selectedProviders.add(providerName);
+    
+    addHostModal.classList.remove("show");
+    logPush("INFO", null, `Добавлен пользовательский хост: ${cleanHost} (${providerName})`);
+    
+    renderProvidersList();
+    updateProvidersBadge();
+    updateCategoryTabCounts();
+    
+    // Switch to custom category tab
+    categoryTabs.querySelectorAll(".tab-btn").forEach(t => t.classList.remove("active"));
+    customTab.classList.add("active");
+    state.currentCategory = "custom";
+    renderTable();
+  });
+
+  // Search input
   searchInput.addEventListener("input", (e) => {
     state.searchQuery = e.target.value;
     renderTable();
   });
 
+  // Sliders
   timeoutSlider.addEventListener("input", (e) => {
     state.timeout = e.target.value;
     timeoutVal.textContent = `${state.timeout}s`;
@@ -1260,6 +2108,12 @@
     concurrencyVal.textContent = state.concurrency;
   });
 
+  // Clear log
+  clearLogBtn.addEventListener("click", () => {
+    logEl.textContent = "";
+  });
+
+  // Category Tabs
   categoryTabs.addEventListener("click", (e) => {
     if (e.target.classList.contains("tab-btn")) {
       categoryTabs.querySelectorAll(".tab-btn").forEach(t => t.classList.remove("active"));
@@ -1271,25 +2125,24 @@
 
   // INIT
   async function init() {
-    // Check saved theme preference
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "classic") {
       document.body.classList.add("classic-theme");
-      toggleTheme(); // sync icons
-      document.body.classList.add("classic-theme"); // force classic state
+      toggleTheme();
+      document.body.classList.add("classic-theme");
     }
+
+    handleUrlQueryParams();
 
     if (tryHandleShare()) {
-      return; // Loaded archival share results, halt standard scanning init
+      return;
     }
 
+    initProviders();
     updateCategoryTabCounts();
     renderTable();
     
-    // Enable start buttons
     btnStart.disabled = false;
-
-    // Fetch user ASN and populate log
     logPush("INFO", null, "Дашборд успешно запущен и готов к работе.");
     await fetchAsn();
   }

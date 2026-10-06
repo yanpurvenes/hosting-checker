@@ -771,6 +771,203 @@
       border: 0;
     }
 
+    /* TRACEROUTE PANEL */
+    .traceroute-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 14px;
+      border: 1px solid var(--border-glow);
+    }
+
+    .traceroute-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 14px;
+    }
+
+    .traceroute-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .traceroute-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--clr-info), var(--clr-accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: white;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+    }
+
+    .traceroute-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .traceroute-desc {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .traceroute-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .trace-controls-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 1.8fr) minmax(180px, 1fr) auto;
+      gap: 14px;
+      align-items: flex-end;
+    }
+
+    @media (max-width: 820px) {
+      .trace-controls-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .trace-control-col {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .trace-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .trace-select, .trace-input {
+      padding: 9px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--text-primary);
+      font-size: 0.88rem;
+      outline: none;
+      transition: var(--transition);
+      width: 100%;
+    }
+
+    body.classic-theme .trace-select,
+    body.classic-theme .trace-input {
+      background: #ffffff;
+      border-color: #ced4da;
+      color: #212529;
+    }
+
+    .trace-select:focus, .trace-input:focus {
+      border-color: var(--clr-info);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .trace-meta-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+    }
+
+    body.classic-theme .trace-meta-strip {
+      background: #f8f9fa;
+      border-color: #e9ecef;
+    }
+
+    .trace-pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+    }
+
+    body.classic-theme .trace-pill {
+      background: #e9ecef;
+      color: #495057;
+    }
+
+    .trace-pill strong {
+      color: var(--text-primary);
+    }
+
+    .trace-terminal-box {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: #090d16;
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    body.classic-theme .trace-terminal-box {
+      background: #1e1e1e;
+    }
+
+    .trace-term-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .trace-term-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .trace-term-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .trace-term-title {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .trace-code-area {
+      padding: 14px 16px;
+      margin: 0;
+      color: #38bdf8;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.55;
+      max-height: 380px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
     /* MODAL */
     .modal-backdrop {
       position: fixed;
@@ -951,6 +1148,11 @@
           🔗 Share
         </button>
 
+        <!-- Traceroute Nav Button -->
+        <button id="nav-traceroute-btn" class="btn btn-secondary" title="Перейти к разделу трассировки маршрутов">
+          📍 Трассировка
+        </button>
+
         <!-- Theme Toggle -->
         <button id="theme-toggle" class="theme-toggle-btn" title="Переключить тему оформления (Modern / Classic)">
           <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24">
@@ -1001,6 +1203,7 @@
         <button class="tab-btn" data-category="foreign-cdn">Зарубежные CDN (0)</button>
         <button class="tab-btn" data-category="rf-cdn">Российские CDN (0)</button>
         <button class="tab-btn" data-category="infomaniak">Infomaniak (0)</button>
+        <button class="tab-btn" data-category="traceroute" id="tab-traceroute-btn">📍 Трассировка</button>
         <button class="tab-btn" data-category="custom" style="display:none;" id="custom-tab">Свои хосты (0)</button>
       </div>
     </section>
@@ -1021,6 +1224,108 @@
         </tbody>
       </table>
     </div>
+
+    <!-- TRACEROUTE & HOP-BY-HOP DIAGNOSTICS PANEL -->
+    <section class="glass-panel traceroute-panel" id="traceroute-panel">
+      <div class="traceroute-header">
+        <div class="traceroute-brand">
+          <div class="traceroute-badge">📍</div>
+          <div>
+            <h2 class="traceroute-title">Трассировка маршрута (Live Traceroute)</h2>
+            <p class="traceroute-desc">Диагностика сетевого маршрута к Infomaniak и зарубежным хостингам с возможностью мгновенного копирования</p>
+          </div>
+        </div>
+        <div class="traceroute-actions">
+          <button id="trace-copy-btn" class="btn btn-secondary" disabled title="Скопировать вывод трассировки в буфер обмена">
+            <span id="trace-copy-icon">📋</span> <span id="trace-copy-text">Скопировать вывод</span>
+          </button>
+          <button id="trace-cmd-copy-btn" class="btn btn-secondary" title="Скопировать команду для локального терминала">
+            <span>💻</span> Команда для консоли
+          </button>
+        </div>
+      </div>
+
+      <!-- CONTROLS ROW -->
+      <div class="trace-controls-grid">
+        <div class="trace-control-col">
+          <label class="trace-label" for="trace-target-select">Выберите хостинг или сервер:</label>
+          <select id="trace-target-select" class="trace-select">
+            <optgroup label="🇨🇭 Infomaniak (Швейцария)">
+              <option value="185.125.25.1" data-host="www.infomaniak.com" data-asn="AS29222 Infomaniak Network SA (CH)" selected>Infomaniak (185.125.25.1 | www.infomaniak.com)</option>
+            </optgroup>
+            <optgroup label="🇩🇪/🇫🇮 Hetzner Online">
+              <option value="144.76.4.228" data-host="king.hr" data-asn="AS24940 Hetzner Online GmbH (DE)">Hetzner DE (144.76.4.228 | king.hr)</option>
+              <option value="95.216.4.218" data-host="nioges.com" data-asn="AS24940 Hetzner Online GmbH (FI)">Hetzner FI (95.216.4.218 | nioges.com)</option>
+            </optgroup>
+            <optgroup label="🇫🇷 OVHcloud">
+              <option value="188.165.254.16" data-host="www.adwin.fr" data-asn="AS16276 OVH SAS (FR)">OVHcloud (188.165.254.16 | www.adwin.fr)</option>
+            </optgroup>
+            <optgroup label="🌊 DigitalOcean">
+              <option value="139.59.129.242" data-host="ui-arts.com" data-asn="AS14061 DigitalOcean (EU)">DigitalOcean (139.59.129.242 | ui-arts.com)</option>
+            </optgroup>
+            <optgroup label="☁️ Amazon Web Services (AWS)">
+              <option value="18.198.63.243" data-host="amplifon.com" data-asn="AS16509 Amazon.com (DE)">AWS Frankfurt (18.198.63.243 | amplifon.com)</option>
+            </optgroup>
+            <optgroup label="🟠 Cloudflare">
+              <option value="172.67.70.222" data-host="esm.sh" data-asn="AS13335 Cloudflare (Anycast)">Cloudflare (172.67.70.222 | esm.sh)</option>
+            </optgroup>
+            <optgroup label="⚡ Vultr">
+              <option value="192.248.182.205" data-host="askit-app.de" data-asn="AS20473 Choopa / Vultr (DE)">Vultr Frankfurt (192.248.182.205 | askit-app.de)</option>
+            </optgroup>
+            <optgroup label="🇩🇪 Netcup & Contabo">
+              <option value="46.38.224.30" data-host="www.netcup.de" data-asn="AS197540 netcup GmbH (DE)">Netcup (46.38.224.30 | www.netcup.de)</option>
+              <option value="13.140.169.107" data-host="antoniotartaglia.it" data-asn="AS51167 Contabo GmbH (DE)">Contabo (13.140.169.107 | antoniotartaglia.it)</option>
+            </optgroup>
+            <option value="custom" data-host="" data-asn="Пользовательский узел">✏️ Ввести свой IP или домен...</option>
+          </select>
+        </div>
+
+        <div class="trace-control-col" id="trace-custom-wrap" style="display:none;">
+          <label class="trace-label" for="trace-custom-input">Произвольный IP или домен:</label>
+          <input type="text" id="trace-custom-input" class="trace-input" placeholder="например, 179.237.66.98 или vps.my.com">
+        </div>
+
+        <div class="trace-control-col">
+          <label class="trace-label" for="trace-probe-select">Точка замера (Зонд):</label>
+          <select id="trace-probe-select" class="trace-select">
+            <option value="RU" selected>🇷🇺 Россия (Москва / RU Probes)</option>
+            <option value="DE">🇩🇪 Германия (Франкфурт / DE)</option>
+            <option value="NL">🇳🇱 Нидерланды (Амстердам / NL)</option>
+            <option value="WORLD">🌐 Ближайший международный узел</option>
+          </select>
+        </div>
+
+        <div class="trace-control-col" style="align-self: flex-end;">
+          <button id="trace-start-btn" class="btn btn-primary" style="height: 40px; padding: 0 22px;">
+            <span id="trace-start-icon">🚀</span> <span id="trace-start-text">Трассировать</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- TARGET META STRIP -->
+      <div class="trace-meta-strip">
+        <div class="trace-pill"><span>Цель:</span> <strong id="trace-pill-target">185.125.25.1</strong></div>
+        <div class="trace-pill"><span>Хост:</span> <strong id="trace-pill-host">www.infomaniak.com</strong></div>
+        <div class="trace-pill"><span>Провайдер:</span> <strong id="trace-pill-asn">AS29222 Infomaniak Network SA (CH)</strong></div>
+        <div class="trace-pill"><span>Зонд:</span> <strong id="trace-pill-probe">Ожидание...</strong></div>
+        <div class="trace-pill"><span>Статус:</span> <strong id="trace-pill-status" style="color:var(--clr-info);">Готов к запуску</strong></div>
+      </div>
+
+      <!-- CONSOLE TERMINAL OUTPUT -->
+      <div class="trace-terminal-box">
+        <div class="trace-term-header">
+          <div class="trace-term-dots">
+            <span class="dot-red"></span>
+            <span class="dot-yellow"></span>
+            <span class="dot-green"></span>
+          </div>
+          <span class="trace-term-title">traceroute terminal console</span>
+          <button id="trace-clear-btn" class="btn-link" style="font-size:0.75rem;">Очистить</button>
+        </div>
+        <pre id="trace-console" class="trace-code-area">Нажмите «🚀 Трассировать», чтобы запустить сетевую трассировку к выбранному хостингу.
+Результат с хопами, задержками (RTT), узлами транзита и точками обрыва отобразится здесь, и его можно будет мгновенно скопировать кнопкой «📋 Скопировать вывод».</pre>
+      </div>
+    </section>
 
   </main>
 
@@ -2115,6 +2420,10 @@
 
   // Category Tabs
   categoryTabs.addEventListener("click", (e) => {
+    if (e.target.id === "tab-traceroute-btn" || e.target.getAttribute("data-category") === "traceroute") {
+      document.getElementById("traceroute-panel").scrollIntoView({ behavior: "smooth" });
+      return;
+    }
     if (e.target.classList.contains("tab-btn")) {
       categoryTabs.querySelectorAll(".tab-btn").forEach(t => t.classList.remove("active"));
       e.target.classList.add("active");
@@ -2122,6 +2431,212 @@
       renderTable();
     }
   });
+
+  // TRACEROUTE COMPONENT LOGIC
+  const traceTargetSelect = document.getElementById("trace-target-select");
+  const traceCustomWrap = document.getElementById("trace-custom-wrap");
+  const traceCustomInput = document.getElementById("trace-custom-input");
+  const traceProbeSelect = document.getElementById("trace-probe-select");
+  const traceStartBtn = document.getElementById("trace-start-btn");
+  const traceStartIcon = document.getElementById("trace-start-icon");
+  const traceStartText = document.getElementById("trace-start-text");
+  const traceCopyBtn = document.getElementById("trace-copy-btn");
+  const traceCopyText = document.getElementById("trace-copy-text");
+  const traceCmdCopyBtn = document.getElementById("trace-cmd-copy-btn");
+  const traceClearBtn = document.getElementById("trace-clear-btn");
+  const traceConsole = document.getElementById("trace-console");
+  
+  const tracePillTarget = document.getElementById("trace-pill-target");
+  const tracePillHost = document.getElementById("trace-pill-host");
+  const tracePillAsn = document.getElementById("trace-pill-asn");
+  const tracePillProbe = document.getElementById("trace-pill-probe");
+  const tracePillStatus = document.getElementById("trace-pill-status");
+  const navTracerouteBtn = document.getElementById("nav-traceroute-btn");
+
+  let currentTraceOutput = "";
+
+  function updateTracePills() {
+    const sel = traceTargetSelect;
+    const isCustom = sel.value === "custom";
+    traceCustomWrap.style.display = isCustom ? "flex" : "none";
+
+    if (isCustom) {
+      const val = traceCustomInput.value.trim() || "127.0.0.1";
+      tracePillTarget.textContent = val;
+      tracePillHost.textContent = val;
+      tracePillAsn.textContent = "Пользовательский узел";
+    } else {
+      const opt = sel.options[sel.selectedIndex];
+      tracePillTarget.textContent = opt.value;
+      tracePillHost.textContent = opt.getAttribute("data-host") || opt.value;
+      tracePillAsn.textContent = opt.getAttribute("data-asn") || "Зарубежный дата-центр";
+    }
+  }
+
+  traceTargetSelect.addEventListener("change", updateTracePills);
+  traceCustomInput.addEventListener("input", updateTracePills);
+
+  if (navTracerouteBtn) {
+    navTracerouteBtn.addEventListener("click", () => {
+      document.getElementById("traceroute-panel").scrollIntoView({ behavior: "smooth" });
+    });
+  }
+
+  traceClearBtn.addEventListener("click", () => {
+    traceConsole.textContent = "Консоль очищена. Выберите хостинг и нажмите «🚀 Трассировать».";
+    currentTraceOutput = "";
+    traceCopyBtn.disabled = true;
+    tracePillStatus.textContent = "Готов к запуску";
+    tracePillStatus.style.color = "var(--clr-info)";
+  });
+
+  traceCopyBtn.addEventListener("click", async () => {
+    if (!currentTraceOutput) return;
+    try {
+      await navigator.clipboard.writeText(currentTraceOutput);
+      const oldText = traceCopyText.textContent;
+      traceCopyText.textContent = "✓ Скопировано!";
+      setTimeout(() => { traceCopyText.textContent = oldText; }, 2000);
+    } catch (e) {
+      alert("Не удалось скопировать в буфер: " + e);
+    }
+  });
+
+  traceCmdCopyBtn.addEventListener("click", async () => {
+    const targetVal = traceTargetSelect.value === "custom" 
+      ? (traceCustomInput.value.trim() || "185.125.25.1") 
+      : traceTargetSelect.value;
+    const cmd = `python3 /Users/yanpurvenes/Documents/Git/trace_hosting.py --host ${targetVal}`;
+    try {
+      await navigator.clipboard.writeText(cmd);
+      const btn = traceCmdCopyBtn;
+      const oldHtml = btn.innerHTML;
+      btn.innerHTML = "<span>✓</span> Скопировано!";
+      setTimeout(() => { btn.innerHTML = oldHtml; }, 2000);
+    } catch (e) {
+      alert("Команда: " + cmd);
+    }
+  });
+
+  async function executeTraceroute() {
+    const isCustom = traceTargetSelect.value === "custom";
+    let target = isCustom ? traceCustomInput.value.trim() : traceTargetSelect.value;
+    if (!target) {
+      alert("Пожалуйста, укажите IP-адрес или домен.");
+      return;
+    }
+    target = target.replace(/^https?:\/\//i, "").replace(/\/.*$/, "");
+
+    const probeLoc = traceProbeSelect.value;
+    traceStartBtn.disabled = true;
+    traceStartIcon.textContent = "⏳";
+    traceStartText.textContent = "Запуск...";
+    traceCopyBtn.disabled = true;
+    
+    tracePillStatus.textContent = "Запуск замера на зонде...";
+    tracePillStatus.style.color = "var(--clr-warning)";
+
+    traceConsole.textContent = `[1/3] Инициализация трассировки к ${target}...\n[2/3] Отправка задания на распределенный зонд (локация: ${probeLoc})...\n`;
+
+    try {
+      const payload = {
+        target: target,
+        type: "traceroute",
+        locations: probeLoc === "WORLD" ? [] : [{ country: probeLoc }]
+      };
+
+      const resCreate = await fetch("https://api.globalping.io/v1/measurements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!resCreate.ok) {
+        throw new Error(`Globalping API error: ${resCreate.status} ${resCreate.statusText}`);
+      }
+
+      const createData = await resCreate.json();
+      const measurementId = createData.id;
+      traceConsole.textContent += `[2/3] Зонд принят в работу (ID: ${measurementId}). Ожидание сетевых пакетов...\n`;
+      tracePillStatus.textContent = "Выполняется трассировка...";
+
+      let finished = false;
+      let finalResult = null;
+      for (let i = 0; i < 15; i++) {
+        await new Promise(r => setTimeout(r, 1200));
+        const resPoll = await fetch(`https://api.globalping.io/v1/measurements/${measurementId}`);
+        if (!resPoll.ok) continue;
+        const pollData = await resPoll.json();
+        
+        if (pollData.status === "finished" || pollData.status === "in-progress") {
+          const firstResult = pollData.results && pollData.results[0];
+          if (firstResult && firstResult.result && firstResult.result.rawOutput) {
+            finalResult = pollData;
+            finished = true;
+            break;
+          }
+        }
+      }
+
+      if (!finished || !finalResult || !finalResult.results || !finalResult.results[0]) {
+        throw new Error("Тайм-аут ожидания ответа от зонда. Попробуйте еще раз или выберите другой зонд.");
+      }
+
+      const probe = finalResult.results[0].probe;
+      const resultObj = finalResult.results[0].result;
+      const rawOutput = resultObj.rawOutput || "";
+
+      tracePillProbe.textContent = `${probe.city || "Online"}, ${probe.country} (${probe.network || "Net"})`;
+      tracePillStatus.textContent = "Успешно завершено ✓";
+      tracePillStatus.style.color = "var(--clr-success)";
+
+      const formattedHeader = 
+`======================================================================================
+  ТРАССИРОВКА МАРШРУТА (TRACEROUTE)
+======================================================================================
+  Целевой адрес:  ${target} (${tracePillHost.textContent})
+  Провайдер/ASN:  ${tracePillAsn.textContent}
+  Зонд-источник:  ${probe.city || ""}, ${probe.country} [AS${probe.asn} ${probe.network || ""}]
+  Время замера:   ${new Date().toLocaleString()}
+--------------------------------------------------------------------------------------
+${rawOutput.trim()}
+======================================================================================
+  Вердикт: Трассировка успешно получена через независимый зонд (${probe.country}).
+======================================================================================`;
+
+      currentTraceOutput = formattedHeader;
+      traceConsole.textContent = formattedHeader;
+      traceCopyBtn.disabled = false;
+      logPush("INFO", "TRACE", `Трассировка к ${target} успешно получена от зонда ${probe.country}`);
+
+    } catch (err) {
+      tracePillStatus.textContent = "Ошибка / Локальный режим";
+      tracePillStatus.style.color = "var(--clr-danger)";
+      
+      const fallbackReport = 
+`[!] Не удалось получить онлайн-трассировку через внешний зонд: ${err.message}
+
+Совет: Запустите прямую трассировку с вашего компьютера в терминале:
+$ python3 /Users/yanpurvenes/Documents/Git/trace_hosting.py --host ${target}
+
+Или стандартной утилитой:
+$ traceroute ${target}
+$ sudo traceroute -P tcp -p 443 ${target}
+
+(Нажмите «Команда для консоли», чтобы скопировать вызов)`;
+
+      currentTraceOutput = fallbackReport;
+      traceConsole.textContent = fallbackReport;
+      traceCopyBtn.disabled = false;
+      logPush("WARN", "TRACE", `Ошибка traceroute к ${target}: ${err.message}`);
+    } finally {
+      traceStartBtn.disabled = false;
+      traceStartIcon.textContent = "🚀";
+      traceStartText.textContent = "Трассировать";
+    }
+  }
+
+  traceStartBtn.addEventListener("click", executeTraceroute);
 
   // INIT
   async function init() {

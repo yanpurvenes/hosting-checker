@@ -25,6 +25,9 @@
   * **Зарубежные CDN (`foreign-cdn`):** Cloudflare, Fastly, Akamai, CDN77, Gcore, GitHub Pages.
   * **Российские CDN (`rf-cdn`):** Yandex CDN, VK CDN, EdgeCenter CDN, Ngenix, CDNvideo, MTS CDN, MegaFon CDN.
   * **Infomaniak (`infomaniak`):** Выделенная категория для хостинга Infomaniak.
+* **Онлайн-трассировка маршрутов (Live Traceroute & CLI):**
+  * Встроенный интерактивный терминал сетевой трассировки маршрутов через распределенные зонды (в т.ч. прямо из РФ) к Infomaniak, Hetzner, OVH, DigitalOcean, AWS, Cloudflare с возможностью мгновенного копирования вывода (`Copy Output`).
+  * Консольная Python-утилита `trace_hosting.py` для глубокой L4/L7 диагностики, выявления DPI/ТСПУ блокировок и пошаговой BGP/ASN трассировки без раскрытия клиентского IP.
 * **Селектор провайдеров (Provider Selector Dropdown):**
   * Выпадающее интерактивное меню с поисковым фильтром.
   * Возможность включить/выключить отдельных провайдеров (кнопки «Выбрать все» и «Снять все»).

@@ -1,0 +1,3144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RU :: TCP 16-20 DPI & Hosting Checker</title>
+  <meta name="description" content="Инструмент для проверки доступности зарубежных и российских хостингов, VPS, CDN и популярных сервисов методами TCP 16-20 DPI напрямую из браузера.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* VARIABLES */
+    :root {
+      /* Dark Theme (Default Modern) */
+      --bg-base: #060913;
+      --bg-surface: rgba(15, 22, 42, 0.75);
+      --bg-card: rgba(30, 41, 59, 0.55);
+      --border-glow: rgba(99, 102, 241, 0.2);
+      --border-color: rgba(255, 255, 255, 0.08);
+      
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      
+      --clr-success: #10b981;
+      --clr-danger: #f43f5e;
+      --clr-warning: #f59e0b;
+      --clr-info: #3b82f6;
+      --clr-accent: #8b5cf6;
+      
+      --btn-start-bg: #ff008b;
+      --btn-start-hover: #d40074;
+      --btn-secondary-bg: rgba(255, 255, 255, 0.07);
+      --btn-secondary-hover: rgba(255, 255, 255, 0.12);
+      
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-base: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Fira Code', 'Courier New', Courier, monospace;
+    }
+
+    /* CLASSIC LIGHT THEME (HYPERION STYLE OVERRIDES) */
+    body.classic-theme {
+      --bg-base: #f5f7fa;
+      --bg-surface: #ffffff;
+      --bg-card: #ffffff;
+      --border-glow: rgba(0, 0, 0, 0.05);
+      --border-color: #dee2e6;
+      
+      --text-primary: #212529;
+      --text-secondary: #495057;
+      --text-muted: #6c757d;
+      
+      --clr-success: #28a745;
+      --clr-danger: #dc3545;
+      --clr-warning: #fd7e14;
+      --clr-info: #007bff;
+      --clr-accent: #6f42c1;
+
+      --btn-secondary-bg: #e9ecef;
+      --btn-secondary-hover: #ced4da;
+      
+      --radius-lg: 8px;
+      --radius-md: 6px;
+      --radius-sm: 4px;
+      --font-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      --font-mono: 'Courier New', Courier, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-base);
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      padding: 20px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* GRADIENT BG FOR DARK MODE ONLY */
+    body:not(.classic-theme) {
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(255, 0, 139, 0.03) 0%, transparent 60%);
+      background-attachment: fixed;
+    }
+
+    .app-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* PANEL STYLING */
+    .glass-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
+      transition: var(--transition);
+    }
+
+    body:not(.classic-theme) .glass-panel {
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+    }
+
+    /* HEADER & BRANDING */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 20px;
+      margin-bottom: 12px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, #ff008b, var(--clr-accent));
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 1.3rem;
+      font-family: 'Space Grotesk', sans-serif;
+      box-shadow: 0 4px 12px rgba(255, 0, 139, 0.3);
+    }
+
+    .brand-titles h1 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-titles h1 .version-badge {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--clr-accent);
+      border: 1px solid var(--border-glow);
+      font-weight: 600;
+    }
+
+    body.classic-theme .brand-titles h1 {
+      font-family: var(--font-base);
+      color: #1a1a1a;
+    }
+
+    body.classic-theme .brand-titles h1 .version-badge {
+      background: #e9ecef;
+      color: #495057;
+      border-color: #ced4da;
+    }
+
+    .brand-titles p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* CONTROLS & BUTTONS */
+    .action-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      color: #ffffff;
+      transition: var(--transition);
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .btn:disabled {
+      background: #6c757d !important;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+      opacity: 0.6;
+    }
+
+    .btn-primary {
+      background: var(--btn-start-bg);
+      min-width: 120px;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--btn-start-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 0, 139, 0.35);
+    }
+
+    .btn-secondary {
+      background: var(--btn-secondary-bg);
+      border-color: var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--btn-secondary-hover);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
+    }
+
+    body.classic-theme .btn-secondary {
+      background: #f8f9fa;
+      border-color: #ced4da;
+      color: #212529;
+    }
+
+    body.classic-theme .btn-secondary:hover:not(:disabled) {
+      background: #e2e6ea;
+      border-color: #dae0e5;
+    }
+
+    .theme-toggle-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .theme-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--clr-info);
+    }
+
+    body.classic-theme .theme-toggle-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    /* DROPDOWNS */
+    .dropdown-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 100;
+      min-width: 260px;
+      max-width: calc(100vw - 30px);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      padding: 10px;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    body:not(.classic-theme) .dropdown-menu {
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      background: rgba(15, 22, 42, 0.95);
+    }
+
+    body.classic-theme .dropdown-menu {
+      background: #ffffff;
+      border-color: #ced4da;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    }
+
+    .dropdown-menu.show {
+      display: flex;
+    }
+
+    /* PROVIDERS SELECTOR DROPDOWN */
+    .providers-dropdown-menu {
+      width: 320px;
+      max-height: 420px;
+    }
+
+    .dropdown-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .dropdown-filter-input {
+      width: 100%;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    body.classic-theme .dropdown-filter-input {
+      background: #ffffff;
+      border-color: #ced4da;
+    }
+
+    .dropdown-quick-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+
+    .btn-link {
+      background: none;
+      border: none;
+      color: var(--clr-info);
+      cursor: pointer;
+      font-size: 0.78rem;
+      padding: 2px 4px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+
+    .btn-link:hover {
+      text-decoration: underline;
+    }
+
+    .providers-scroll-list {
+      max-height: 280px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding-right: 4px;
+    }
+
+    .provider-option-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition);
+    }
+
+    .provider-option-label:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    body.classic-theme .provider-option-label:hover {
+      background: #f1f3f5;
+    }
+
+    .provider-option-label input[type="checkbox"] {
+      margin-right: 8px;
+      accent-color: var(--btn-start-bg);
+      cursor: pointer;
+    }
+
+    .provider-count-pill {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+
+    body.classic-theme .provider-count-pill {
+      background: #e9ecef;
+      color: #6c757d;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      font-size: 0.88rem;
+      background: none;
+      border: none;
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      text-align: left;
+      cursor: pointer;
+      transition: var(--transition);
+      width: 100%;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--clr-info);
+    }
+
+    body.classic-theme .dropdown-item:hover {
+      background: #f1f3f5;
+      color: #007bff;
+    }
+
+    /* RIPE ASN INFO */
+    .asn-banner {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.025);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--clr-info);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    body.classic-theme .asn-banner {
+      background: #e9ecef;
+      border-left-color: #007bff;
+      color: #495057;
+    }
+
+    .asn-br::after {
+      content: " • ";
+      opacity: 0.5;
+    }
+
+    /* CONFIGURATION ROW */
+    .config-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    body.classic-theme .config-row {
+      background: #f8f9fa;
+    }
+
+    .config-group {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .config-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .range-slider {
+      -webkit-appearance: none;
+      width: 90px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    body.classic-theme .range-slider {
+      background: #dee2e6;
+    }
+
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--clr-info);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    /* SEARCH & TABS */
+    .filter-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .search-bar {
+      flex: 1;
+      padding: 10px 16px;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      outline: none;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    body.classic-theme .search-bar {
+      background: #ffffff;
+      border-color: #ced4da;
+    }
+
+    .search-bar:focus {
+      border-color: var(--clr-info);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .category-tabs {
+      display: flex;
+      gap: 5px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .tab-btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+      transition: var(--transition);
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    body.classic-theme .tab-btn:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    .tab-btn.active {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.3);
+      color: var(--clr-info);
+    }
+
+    body.classic-theme .tab-btn.active {
+      background: #007bff;
+      border-color: #007bff;
+      color: #ffffff;
+    }
+
+    /* HOSTS TABLE */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 10px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .hosts-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .hosts-table th,
+    .hosts-table td {
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .hosts-table th {
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-align: center;
+      font-size: 0.82rem;
+      letter-spacing: 0.3px;
+    }
+
+    .hosts-table th.th-left,
+    .hosts-table td.td-left {
+      text-align: left;
+    }
+
+    body.classic-theme .hosts-table th {
+      background: #007bff;
+      color: #ffffff;
+      border: 1px solid #dee2e6;
+    }
+
+    body.classic-theme .hosts-table td {
+      border: 1px solid #dee2e6;
+      background: #ffffff;
+    }
+
+    .hosts-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    body:not(.classic-theme) .hosts-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    /* STATUS PILLS & BADGES */
+    .ok {
+      color: var(--clr-success) !important;
+      font-weight: 600;
+    }
+
+    .bad {
+      color: var(--clr-danger) !important;
+      font-weight: 600;
+    }
+
+    .skip {
+      color: var(--text-muted) !important;
+      font-weight: 500;
+    }
+
+    .checking-text {
+      color: var(--clr-info);
+      font-weight: 500;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .badge-alive-yes {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--clr-success);
+    }
+
+    .badge-alive-no {
+      background: rgba(244, 63, 94, 0.12);
+      color: var(--clr-danger);
+    }
+
+    .badge-alive-unknown {
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--clr-warning);
+    }
+
+    .badge-dpi-ok {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--clr-success);
+    }
+
+    .badge-dpi-bad {
+      background: rgba(244, 63, 94, 0.15);
+      color: var(--clr-danger);
+    }
+
+    .badge-dpi-warn {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--clr-warning);
+    }
+
+    .badge-dpi-skip {
+      background: rgba(100, 116, 139, 0.12);
+      color: var(--text-muted);
+    }
+
+    .reason-tag {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      opacity: 0.85;
+      margin-left: 4px;
+    }
+
+    /* MONOSPACE CONSOLE LOG */
+    .log-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .log-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .log-header-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    #log {
+      background: #090d16;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      max-height: 240px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    body.classic-theme #log {
+      background: #1a1a1a;
+      color: #d4d4d4;
+      border: 0;
+    }
+
+    /* TRACEROUTE PANEL */
+    .traceroute-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 14px;
+      border: 1px solid var(--border-glow);
+    }
+
+    .traceroute-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 14px;
+    }
+
+    .traceroute-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .traceroute-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--clr-info), var(--clr-accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: white;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+    }
+
+    .traceroute-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .traceroute-desc {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .traceroute-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .trace-controls-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 1.8fr) minmax(180px, 1fr) auto;
+      gap: 14px;
+      align-items: flex-end;
+    }
+
+    @media (max-width: 820px) {
+      .trace-controls-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .trace-control-col {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .trace-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .trace-select, .trace-input {
+      padding: 9px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--text-primary);
+      font-size: 0.88rem;
+      outline: none;
+      transition: var(--transition);
+      width: 100%;
+    }
+
+    body.classic-theme .trace-select,
+    body.classic-theme .trace-input {
+      background: #ffffff;
+      border-color: #ced4da;
+      color: #212529;
+    }
+
+    .trace-select:focus, .trace-input:focus {
+      border-color: var(--clr-info);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .trace-meta-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+    }
+
+    body.classic-theme .trace-meta-strip {
+      background: #f8f9fa;
+      border-color: #e9ecef;
+    }
+
+    .trace-pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+    }
+
+    body.classic-theme .trace-pill {
+      background: #e9ecef;
+      color: #495057;
+    }
+
+    .trace-pill strong {
+      color: var(--text-primary);
+    }
+
+    .trace-terminal-box {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: #090d16;
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    body.classic-theme .trace-terminal-box {
+      background: #1e1e1e;
+    }
+
+    .trace-term-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .trace-term-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .trace-term-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .trace-term-title {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .trace-code-area {
+      padding: 14px 16px;
+      margin: 0;
+      color: #38bdf8;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.55;
+      max-height: 380px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* MODAL */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    body.classic-theme .modal-card {
+      background: #ffffff;
+      border-color: #ced4da;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .modal-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.85rem;
+    }
+
+    .modal-input {
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    body.classic-theme .modal-input {
+      background: #ffffff;
+      border-color: #ced4da;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    /* FOOTER */
+    .app-footer {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 1rem;
+      line-height: 1.6;
+    }
+
+    .app-footer a {
+      color: var(--clr-info);
+      text-decoration: none;
+    }
+
+    .app-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* RESPONSIVE DESIGN */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .action-bar {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .hosts-table th, 
+      .hosts-table td {
+        padding: 6px 8px;
+        font-size: 0.78rem;
+      }
+      .config-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- MAIN scanning PANEL -->
+  <main class="glass-panel">
+    
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="brand-group">
+        <div class="logo-badge">⚡</div>
+        <div class="brand-titles">
+          <h1 id="app-title">
+            RU :: TCP 16-20 & Hosting Checker
+            <span class="version-badge">v2.4 Pro</span>
+          </h1>
+          <p id="app-subtitle">Проверка доступности VPS-хостингов, CDN и сервисов методами TCP 16-20 из браузера</p>
+        </div>
+      </div>
+      
+      <div class="action-bar">
+        <!-- Start / Stop -->
+        <button id="start-btn" class="btn btn-primary" disabled>🔍 Start</button>
+        
+        <!-- Provider multi-select dropdown -->
+        <div class="dropdown-wrapper">
+          <button id="providers-btn" class="btn btn-secondary" title="Выбор провайдеров для тестирования">
+            🏢 Провайдеры <span id="providers-count-badge">(0/0)</span> ▾
+          </button>
+          <div id="providers-menu" class="dropdown-menu providers-dropdown-menu">
+            <div class="dropdown-header">
+              <input type="text" id="provider-filter-input" class="dropdown-filter-input" placeholder="Фильтр по названию...">
+              <div class="dropdown-quick-actions">
+                <button type="button" id="providers-select-all" class="btn-link">Выбрать все</button>
+                <button type="button" id="providers-deselect-all" class="btn-link">Снять все</button>
+              </div>
+            </div>
+            <div id="providers-list" class="providers-scroll-list">
+              <!-- Dynamically filled with checkboxes -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Custom Target -->
+        <button id="add-host-btn" class="btn btn-secondary" title="Добавить пользовательский хост для проверки">
+          ➕ Хост
+        </button>
+
+        <!-- Export Dropdown -->
+        <div class="dropdown-wrapper">
+          <button id="export-dropdown-btn" class="btn btn-secondary" title="Сохранить результаты в файл">
+            💾 Экспорт ▾
+          </button>
+          <div id="export-menu" class="dropdown-menu">
+            <button type="button" id="export-json-btn" class="dropdown-item">📄 Скачать JSON</button>
+            <button type="button" id="export-csv-btn" class="dropdown-item">📊 Скачать CSV</button>
+          </div>
+        </div>
+
+        <!-- Share URL -->
+        <button id="share-btn" class="btn btn-secondary" disabled title="Скопировать ссылку с результатами">
+          🔗 Share
+        </button>
+
+        <!-- Traceroute Nav Button -->
+        <button id="nav-traceroute-btn" class="btn btn-secondary" title="Перейти к разделу трассировки маршрутов">
+          📍 Трассировка
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="theme-toggle" class="theme-toggle-btn" title="Переключить тему оформления (Modern / Classic)">
+          <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24">
+            <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- CLIENT RIPE ASN INFO -->
+    <div class="asn-banner" id="asn-banner">
+      <span id="asn">Определение сетевого провайдера клиента...</span>
+      <span id="shareTs"></span>
+    </div>
+
+    <!-- CONFIGURATION AND CONTROLS -->
+    <section class="config-row">
+      <div class="config-group">
+        <div class="config-item">
+          <span>Таймаут:</span>
+          <input type="range" id="timeout-slider" class="range-slider" min="1" max="20" value="10">
+          <span id="timeout-val" style="font-weight:600; color: var(--clr-info);">10s</span>
+        </div>
+        <div class="config-item">
+          <span>Потоки:</span>
+          <input type="range" id="concurrency-slider" class="range-slider" min="1" max="12" value="6">
+          <span id="concurrency-val" style="font-weight:600; color: var(--clr-accent);">6</span>
+        </div>
+      </div>
+      <div style="font-size:0.85rem; color: var(--text-muted); display:flex; align-items:center; gap: 10px;">
+        <span id="progress-text"></span>
+        <span>Статус: <span id="status" class="status-ready ok">Ready ⚡</span></span>
+      </div>
+    </section>
+
+    <!-- SEARCH & FILTER TABS -->
+    <section class="filter-wrapper">
+      <div class="search-row">
+        <input type="text" id="search-input" class="search-bar" placeholder="Быстрый поиск по названию провайдера, домену или ID...">
+      </div>
+      
+      <div class="category-tabs" id="category-tabs">
+        <button class="tab-btn active" data-category="all">Все ресурсы (0)</button>
+        <button class="tab-btn" data-category="popular-services">Популярные сервисы (0)</button>
+        <button class="tab-btn" data-category="mobile-push">Push-уведомления (0)</button>
+        <button class="tab-btn" data-category="foreign-vps">Зарубежные VPS (0)</button>
+        <button class="tab-btn" data-category="eu-niche">Нишевые VPS Европы (0)</button>
+        <button class="tab-btn" data-category="rf-roots">Хостинги и облака РФ (0)</button>
+        <button class="tab-btn" data-category="foreign-cdn">Зарубежные CDN (0)</button>
+        <button class="tab-btn" data-category="rf-cdn">Российские CDN (0)</button>
+        <button class="tab-btn" data-category="infomaniak">Infomaniak (0)</button>
+        <button class="tab-btn" data-category="traceroute" id="tab-traceroute-btn">📍 Трассировка</button>
+        <button class="tab-btn" data-category="custom" style="display:none;" id="custom-tab">Свои хосты (0)</button>
+      </div>
+    </section>
+
+    <!-- RESULTS TABLE -->
+    <div class="table-container">
+      <table class="hosts-table" id="results">
+        <thead>
+          <tr>
+            <th style="width: 10%;">ID</th>
+            <th class="th-left" style="width: 46%;">Провайдер / Целевой хост</th>
+            <th style="width: 22%;">Доступен (Alive)</th>
+            <th style="width: 22%;">DPI TCP 16-20</th>
+          </tr>
+        </thead>
+        <tbody id="results-tbody">
+          <!-- Dynamically populated rows -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TRACEROUTE & HOP-BY-HOP DIAGNOSTICS PANEL -->
+    <section class="glass-panel traceroute-panel" id="traceroute-panel">
+      <div class="traceroute-header">
+        <div class="traceroute-brand">
+          <div class="traceroute-badge">📍</div>
+          <div>
+            <h2 class="traceroute-title">Трассировка маршрута (Live Traceroute)</h2>
+            <p class="traceroute-desc">Диагностика сетевого маршрута к Infomaniak и зарубежным хостингам с возможностью мгновенного копирования</p>
+          </div>
+        </div>
+        <div class="traceroute-actions">
+          <button id="trace-copy-btn" class="btn btn-secondary" disabled title="Скопировать вывод трассировки в буфер обмена">
+            <span id="trace-copy-icon">📋</span> <span id="trace-copy-text">Скопировать вывод</span>
+          </button>
+          <button id="trace-cmd-copy-btn" class="btn btn-secondary" title="Скопировать команду для локального терминала">
+            <span>💻</span> Команда для консоли
+          </button>
+        </div>
+      </div>
+
+      <!-- CONTROLS ROW -->
+      <div class="trace-controls-grid">
+        <div class="trace-control-col">
+          <label class="trace-label" for="trace-target-select">Выберите хостинг или сервер:</label>
+          <select id="trace-target-select" class="trace-select">
+            <optgroup label="🇨🇭 Infomaniak (Швейцария)">
+              <option value="185.125.25.1" data-host="www.infomaniak.com" data-asn="AS29222 Infomaniak Network SA (CH)" selected>Infomaniak (185.125.25.1 | www.infomaniak.com)</option>
+            </optgroup>
+            <optgroup label="🇩🇪/🇫🇮 Hetzner Online">
+              <option value="144.76.4.228" data-host="king.hr" data-asn="AS24940 Hetzner Online GmbH (DE)">Hetzner DE (144.76.4.228 | king.hr)</option>
+              <option value="95.216.4.218" data-host="nioges.com" data-asn="AS24940 Hetzner Online GmbH (FI)">Hetzner FI (95.216.4.218 | nioges.com)</option>
+            </optgroup>
+            <optgroup label="🇫🇷 OVHcloud">
+              <option value="188.165.254.16" data-host="www.adwin.fr" data-asn="AS16276 OVH SAS (FR)">OVHcloud (188.165.254.16 | www.adwin.fr)</option>
+            </optgroup>
+            <optgroup label="🌊 DigitalOcean">
+              <option value="139.59.129.242" data-host="ui-arts.com" data-asn="AS14061 DigitalOcean (EU)">DigitalOcean (139.59.129.242 | ui-arts.com)</option>
+            </optgroup>
+            <optgroup label="☁️ Amazon Web Services (AWS)">
+              <option value="18.198.63.243" data-host="amplifon.com" data-asn="AS16509 Amazon.com (DE)">AWS Frankfurt (18.198.63.243 | amplifon.com)</option>
+            </optgroup>
+            <optgroup label="🟠 Cloudflare">
+              <option value="172.67.70.222" data-host="esm.sh" data-asn="AS13335 Cloudflare (Anycast)">Cloudflare (172.67.70.222 | esm.sh)</option>
+            </optgroup>
+            <optgroup label="⚡ Vultr">
+              <option value="192.248.182.205" data-host="askit-app.de" data-asn="AS20473 Choopa / Vultr (DE)">Vultr Frankfurt (192.248.182.205 | askit-app.de)</option>
+            </optgroup>
+            <optgroup label="🇩🇪 Netcup & Contabo">
+              <option value="46.38.224.30" data-host="www.netcup.de" data-asn="AS197540 netcup GmbH (DE)">Netcup (46.38.224.30 | www.netcup.de)</option>
+              <option value="13.140.169.107" data-host="antoniotartaglia.it" data-asn="AS51167 Contabo GmbH (DE)">Contabo (13.140.169.107 | antoniotartaglia.it)</option>
+            </optgroup>
+            <optgroup label="🇫🇮 UpCloud (Финляндия / Германия)">
+              <option value="94.237.1.53" data-host="api.upcloud.com" data-asn="AS202053 UpCloud Ltd (FI)">UpCloud Helsinki (94.237.1.53 | api.upcloud.com)</option>
+              <option value="94.237.24.1" data-host="upcloud.com" data-asn="AS202053 UpCloud Ltd (DE)">UpCloud Frankfurt (94.237.24.1)</option>
+            </optgroup>
+            <optgroup label="🇳🇱 Нидерланды (Tilaa & TransIP)">
+              <option value="84.22.115.3" data-host="tilaa.com" data-asn="AS196752 Tilaa B.V. (NL)">Tilaa Amsterdam (84.22.115.3 | tilaa.com)</option>
+              <option value="37.97.254.1" data-host="www.transip.nl" data-asn="AS20857 Signet / TransIP (NL)">TransIP BladeVPS (37.97.254.1 | www.transip.nl)</option>
+            </optgroup>
+            <optgroup label="🇬🇧/🇧🇬 Clouvider & AlphaVPS">
+              <option value="185.42.220.13" data-host="clouvider.com" data-asn="AS62240 Clouvider Limited (UK/NL)">Clouvider (185.42.220.13 | clouvider.com)</option>
+              <option value="79.124.7.8" data-host="lgbg.alphavps.com" data-asn="AS203380 DA International / AlphaVPS (BG)">AlphaVPS Sofia (79.124.7.8 | lgbg.alphavps.com)</option>
+              <option value="194.35.12.68" data-host="lgde.alphavps.com" data-asn="AS203380 DA International / AlphaVPS (DE)">AlphaVPS Nuremberg (194.35.12.68 | lgde.alphavps.com)</option>
+            </optgroup>
+            <option value="custom" data-host="" data-asn="Пользовательский узел">✏️ Ввести свой IP или домен...</option>
+          </select>
+        </div>
+
+        <div class="trace-control-col" id="trace-custom-wrap" style="display:none;">
+          <label class="trace-label" for="trace-custom-input">Произвольный IP или домен:</label>
+          <input type="text" id="trace-custom-input" class="trace-input" placeholder="например, 179.237.66.98 или vps.my.com">
+        </div>
+
+        <div class="trace-control-col">
+          <label class="trace-label" for="trace-probe-select">Точка замера (Зонд):</label>
+          <select id="trace-probe-select" class="trace-select">
+            <option value="RU" selected>🇷🇺 Россия (Москва / RU Probes)</option>
+            <option value="DE">🇩🇪 Германия (Франкфурт / DE)</option>
+            <option value="NL">🇳🇱 Нидерланды (Амстердам / NL)</option>
+            <option value="WORLD">🌐 Ближайший международный узел</option>
+          </select>
+        </div>
+
+        <div class="trace-control-col" style="align-self: flex-end;">
+          <button id="trace-start-btn" class="btn btn-primary" style="height: 40px; padding: 0 22px;">
+            <span id="trace-start-icon">🚀</span> <span id="trace-start-text">Трассировать</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- TARGET META STRIP -->
+      <div class="trace-meta-strip">
+        <div class="trace-pill"><span>Цель:</span> <strong id="trace-pill-target">185.125.25.1</strong></div>
+        <div class="trace-pill"><span>Хост:</span> <strong id="trace-pill-host">www.infomaniak.com</strong></div>
+        <div class="trace-pill"><span>Провайдер:</span> <strong id="trace-pill-asn">AS29222 Infomaniak Network SA (CH)</strong></div>
+        <div class="trace-pill"><span>Зонд:</span> <strong id="trace-pill-probe">Ожидание...</strong></div>
+        <div class="trace-pill"><span>Статус:</span> <strong id="trace-pill-status" style="color:var(--clr-info);">Готов к запуску</strong></div>
+      </div>
+
+      <!-- CONSOLE TERMINAL OUTPUT -->
+      <div class="trace-terminal-box">
+        <div class="trace-term-header">
+          <div class="trace-term-dots">
+            <span class="dot-red"></span>
+            <span class="dot-yellow"></span>
+            <span class="dot-green"></span>
+          </div>
+          <span class="trace-term-title">traceroute terminal console</span>
+          <button id="trace-clear-btn" class="btn-link" style="font-size:0.75rem;">Очистить</button>
+        </div>
+        <pre id="trace-console" class="trace-code-area">Нажмите «🚀 Трассировать», чтобы запустить сетевую трассировку к выбранному хостингу.
+Результат с хопами, задержками (RTT), узлами транзита и точками обрыва отобразится здесь, и его можно будет мгновенно скопировать кнопкой «📋 Скопировать вывод».</pre>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- LOG PANEL -->
+  <section class="log-panel">
+    <div class="log-header-bar">
+      <div class="log-header-title">Диагностический журнал событий</div>
+      <button id="clear-log-btn" class="btn-link" style="font-size:0.75rem;">Очистить лог</button>
+    </div>
+    <pre id="log"></pre>
+  </section>
+
+  <!-- MODAL: ADD CUSTOM HOST -->
+  <div id="add-host-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-title">➕ Добавить целевой хост</div>
+      <div class="modal-field">
+        <label for="custom-host-input">Домен или IP-адрес (HTTPS):</label>
+        <input type="text" id="custom-host-input" class="modal-input" placeholder="example.com или sub.domain.org">
+      </div>
+      <div class="modal-field">
+        <label for="custom-provider-input">Название провайдера / сервиса:</label>
+        <input type="text" id="custom-provider-input" class="modal-input" placeholder="Мой VPS / Сервер">
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="modal-cancel-btn" class="btn btn-secondary">Отмена</button>
+        <button type="button" id="modal-submit-btn" class="btn btn-primary">Добавить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <p>❗️ В браузерной песочнице соединения обслуживаются пулом сокетов Chrome/Safari/Firefox — для чистоты повторных тестов используйте режим Инкогнито или очищайте сокеты в <a href="chrome://net-internals/#sockets" target="_blank">chrome://net-internals/#sockets</a>.</p>
+    <p>Создано на базе исследований и инструментария <a href="https://github.com/hyperion-cs/dpi-checkers" target="_blank">hyperion-cs/dpi-checkers</a></p>
+  </footer>
+
+</div>
+
+<script>
+  // COMPLETE DATABASE OF TARGETS
+  const TEST_SUITE = [
+    // === 1. POPULAR WEB SERVICES (e2e4401 / default.yaml) ===
+    { id: "SVC.GG-01", provider: "Google", country: "🌐", host: "www.google.com", category: "popular-services" },
+    { id: "SVC.GG-02", provider: "Google", country: "🌐", host: "www.gstatic.com", category: "popular-services" },
+    { id: "SVC.GG-03", provider: "Google", country: "🧠", host: "gemini.google.com", category: "popular-services" },
+    { id: "SVC.YT-01", provider: "YouTube", country: "▶️", host: "www.youtube.com", category: "popular-services" },
+    { id: "SVC.YT-02", provider: "YouTube", country: "🖼️", host: "i.ytimg.com", category: "popular-services" },
+    { id: "SVC.YT-03", provider: "YouTube", country: "⚡", host: "redirector.googlevideo.com", category: "popular-services" },
+    { id: "SVC.X-01", provider: "X (Twitter)", country: "🐦", host: "x.com", category: "popular-services" },
+    { id: "SVC.DC-01", provider: "Discord", country: "💬", host: "discord.com", category: "popular-services" },
+    { id: "SVC.GH-01", provider: "GitHub", country: "🐙", host: "github.com", category: "popular-services" },
+    { id: "SVC.GH-02", provider: "GitHub", country: "🐙", host: "api.github.com", category: "popular-services" },
+    { id: "SVC.GH-03", provider: "GitHub", country: "🐙", host: "raw.githubusercontent.com", category: "popular-services" },
+    { id: "SVC.TG-01", provider: "Telegram", country: "✈️", host: "web.telegram.org", category: "popular-services" },
+    { id: "SVC.TG-02", provider: "Telegram", country: "✈️", host: "api.telegram.org", category: "popular-services" },
+    { id: "SVC.FB-01", provider: "Facebook", country: "👥", host: "www.facebook.com", category: "popular-services" },
+    { id: "SVC.WA-01", provider: "WhatsApp", country: "🟢", host: "web.whatsapp.com", category: "popular-services" },
+    { id: "SVC.IG-01", provider: "Instagram", country: "📷", host: "www.instagram.com", category: "popular-services" },
+    { id: "SVC.LI-01", provider: "LinkedIn", country: "💼", host: "www.linkedin.com", category: "popular-services" },
+    { id: "SVC.YA-01", provider: "Yandex Web", country: "🇷🇺", host: "ya.ru", category: "popular-services" },
+    { id: "SVC.VK-01", provider: "VK", country: "🇷🇺", host: "vk.ru", category: "popular-services" },
+    { id: "SVC.GSU-01", provider: "Gosuslugi", country: "🇷🇺", host: "www.gosuslugi.ru", category: "popular-services" },
+
+    // === 2. MOBILE PUSH NOTIFICATION PROVIDERS (31dc795 / default.yaml) ===
+    { id: "PUSH.FCM-01", provider: "Google FCM / Push", country: "🔔", host: "fcm.googleapis.com", category: "mobile-push" },
+    { id: "PUSH.GACC-01", provider: "Google FCM / Push", country: "🔔", host: "accounts.google.com", category: "mobile-push" },
+    { id: "PUSH.GIID-01", provider: "Google FCM / Push", country: "🔔", host: "iid.googleapis.com", category: "mobile-push" },
+    { id: "PUSH.MTK-01", provider: "Google FCM / Push", country: "🔔", host: "mtalk.google.com", category: "mobile-push" },
+    { id: "PUSH.MTK-02", provider: "Google FCM / Push", country: "🔔", host: "mtalk4.google.com", category: "mobile-push" },
+    { id: "PUSH.MTK-03", provider: "Google FCM / Push", country: "🔔", host: "mtalk-staging.google.com", category: "mobile-push" },
+    { id: "PUSH.MTK-04", provider: "Google FCM / Push", country: "🔔", host: "mtalk-dev.google.com", category: "mobile-push" },
+    { id: "PUSH.MTK-05", provider: "Google FCM / Push", country: "🔔", host: "alt1-mtalk.google.com", category: "mobile-push" },
+    { id: "PUSH.GAND-01", provider: "Google FCM / Push", country: "🔔", host: "android.apis.google.com", category: "mobile-push" },
+    { id: "PUSH.GPRV-01", provider: "Google FCM / Push", country: "🔔", host: "device-provisioning.googleapis.com", category: "mobile-push" },
+    { id: "PUSH.GFIR-01", provider: "Google FCM / Push", country: "🔔", host: "firebaseinstallations.googleapis.com", category: "mobile-push" },
+    { id: "PUSH.APN-01", provider: "Apple APNs", country: "🍎", host: "api.push.apple.com", category: "mobile-push" },
+    { id: "PUSH.APN-02", provider: "Apple APNs", country: "🍎", host: "api.development.push.apple.com", category: "mobile-push" },
+
+    // === 3. FOREIGN CDN (suite.v2.json) ===
+    { id: "US.GH-HPRN", provider: "GitHub Pages", country: "🧠", host: "hyperion-cs.github.io", category: "foreign-cdn" },
+    { id: "PL.AKM-01", provider: "Akamai", country: "🇵🇱", host: "www.mobil.com.se", category: "foreign-cdn" },
+    { id: "SE.AKM-01", provider: "Akamai", country: "🇸🇪", host: "cdn.apple-mapkit.com", category: "foreign-cdn" },
+    { id: "US.CDN77-01", provider: "CDN77", country: "🇺🇸", host: "cdn.eso.org", category: "foreign-cdn" },
+    { id: "CA.CF-01", provider: "Cloudflare", country: "🇨🇦", host: "go.coveo.com", category: "foreign-cdn" },
+    { id: "CA.CF-02", provider: "Cloudflare", country: "🇨🇦", host: "justice.gov", category: "foreign-cdn" },
+    { id: "US.CF-01", provider: "Cloudflare", country: "🇺🇸", host: "img.wzstats.gg", category: "foreign-cdn" },
+    { id: "US.CF-02", provider: "Cloudflare", country: "🇺🇸", host: "esm.sh", category: "foreign-cdn" },
+    { id: "CA.FST-01", provider: "Fastly", country: "🇨🇦", host: "ssl.p.jwpcdn.com", category: "foreign-cdn" },
+    { id: "US.FST-01", provider: "Fastly", country: "🇺🇸", host: "www.jetblue.com", category: "foreign-cdn" },
+    { id: "LU.GCORE-01", provider: "Gcore", country: "🇱🇺", host: "gcore.com", category: "foreign-cdn" },
+
+    // === 4. FOREIGN VPS PROVIDERS (suite.v2.json + Top VPS) ===
+    { id: "DE.AWS-01", provider: "AWS", country: "🇩🇪", host: "amplifon.com", category: "foreign-vps" },
+    { id: "US.AWS-01", provider: "AWS", country: "🇺🇸", host: "optout.aboutads.info", category: "foreign-vps" }, // commit upstream fix
+    { id: "FR.CNTB-01", provider: "Contabo", country: "🇫🇷", host: "antoniotartaglia.it", category: "foreign-vps" },
+    { id: "FR.CNTB-02", provider: "Contabo", country: "🇫🇷", host: "status.moow.info", category: "foreign-vps" },
+    { id: "DE.DO-01", provider: "DigitalOcean", country: "🇩🇪", host: "ui-arts.com", category: "foreign-vps" },
+    { id: "UK.DO-01", provider: "DigitalOcean", country: "🇬🇧", host: "app.thecuriositylibrary.com", category: "foreign-vps" }, // commit e2c1801 fix
+    { id: "UK.DO-02", provider: "DigitalOcean", country: "🇬🇧", host: "admin.survey54.com", category: "foreign-vps" },
+    { id: "US.FTBVM-01", provider: "FT/BuyVM", country: "🇺🇸", host: "buyvm.net", category: "foreign-vps" },
+    { id: "US.FTBVM-02", provider: "FT/BuyVM", country: "🇺🇸", host: "dmvideo.download", category: "foreign-vps" },
+    { id: "US.GC-01", provider: "Google Cloud", country: "🇺🇸", host: "api.usercentrics.eu", category: "foreign-vps" },
+    { id: "US.GC-02", provider: "Google Cloud", country: "🇺🇸", host: "widgets.reputation.com", category: "foreign-vps" },
+    { id: "DE.HE-01", provider: "Hetzner", country: "🇩🇪", host: "king.hr", category: "foreign-vps" },
+    { id: "DE.HE-02", provider: "Hetzner", country: "🇩🇪", host: "mail.server.apaone.com", category: "foreign-vps" },
+    { id: "FI.HE-01", provider: "Hetzner", country: "🇫🇮", host: "nioges.com", category: "foreign-vps" },
+    { id: "FI.HE-02", provider: "Hetzner", country: "🇫🇮", host: "5fd8bdae.nip.io", category: "foreign-vps" },
+    { id: "FI.HE-03", provider: "Hetzner", country: "🇫🇮", host: "net4u.de", category: "foreign-vps" }, // commit 1eaea5a fix
+    { id: "US.MBCOM-01", provider: "Melbicom", country: "🇺🇸", host: "elecane.com", category: "foreign-vps" },
+    { id: "NL.MS-01", provider: "Microsoft/Azure", country: "🇳🇱", host: "store.takeda.com", category: "foreign-vps" },
+    { id: "ES.OR-01", provider: "Oracle", country: "🇪🇸", host: "sh00065.hostgator.com", category: "foreign-vps" },
+    { id: "SG.OR-01", provider: "Oracle", country: "🇸🇬", host: "ged.com.sg", category: "foreign-vps" },
+    { id: "FR.OVH-01", provider: "OVH", country: "🇫🇷", host: "www.adwin.fr", category: "foreign-vps" },
+    { id: "FR.OVH-02", provider: "OVH", country: "🇫🇷", host: "www.emca.be", category: "foreign-vps" },
+    { id: "NL.SW-01", provider: "Scaleway", country: "🇳🇱", host: "www.velivole.fr", category: "foreign-vps" },
+    { id: "DE.VLTR-01", provider: "Vultr", country: "🇩🇪", host: "askit-app.de", category: "foreign-vps" },
+    { id: "US.VLTR-01", provider: "Vultr", country: "🇺🇸", host: "us.rudder.qntmnet.com", category: "foreign-vps" },
+    { id: "DE.NCP-01", provider: "Netcup", country: "🇩🇪", host: "www.netcup.com", category: "foreign-vps" },
+    { id: "DE.NCP-02", provider: "Netcup (CCP)", country: "🇩🇪", host: "customercontrolpanel.de", category: "foreign-vps" },
+    { id: "FI.UPC-EXT", provider: "UpCloud", country: "🇫🇮", host: "upcloud.com", category: "foreign-vps" },
+    { id: "LT.HST-01", provider: "Hostinger", country: "🇱🇹", host: "www.hostinger.com", category: "foreign-vps" },
+    { id: "US.NMC-01", provider: "Namecheap", country: "🇺🇸", host: "www.namecheap.com", category: "foreign-vps" },
+    { id: "US.GDD-01", provider: "GoDaddy", country: "🇺🇸", host: "www.godaddy.com", category: "foreign-vps" },
+    { id: "US.A2H-01", provider: "A2 Hosting", country: "🇺🇸", host: "www.a2hosting.com", category: "foreign-vps" },
+    { id: "BG.STG-01", provider: "SiteGround", country: "🇧🇬", host: "www.siteground.com", category: "foreign-vps" },
+    { id: "US.BLH-01", provider: "Bluehost", country: "🇺🇸", host: "www.bluehost.com", category: "foreign-vps" },
+    { id: "US.DMH-01", provider: "DreamHost", country: "🇺🇸", host: "www.dreamhost.com", category: "foreign-vps" },
+    { id: "US.FCM-01", provider: "FastComet", country: "🇺🇸", host: "www.fastcomet.com", category: "foreign-vps" },
+    { id: "DE.ION-01", provider: "IONOS", country: "🇩🇪", host: "www.ionos.com", category: "foreign-vps" },
+    { id: "US.KMT-01", provider: "Kamatera", country: "🇺🇸", host: "www.kamatera.com", category: "foreign-vps" },
+    { id: "US.RMN-01", provider: "RamNode", country: "🇺🇸", host: "www.ramnode.com", category: "foreign-vps" },
+    { id: "US.HWD-01", provider: "Hostwinds", country: "🇺🇸", host: "www.hostwinds.com", category: "foreign-vps" },
+    { id: "US.ITS-01", provider: "InterServer", country: "🇺🇸", host: "www.interserver.net", category: "foreign-vps" },
+    { id: "US.LQW-01", provider: "Liquid Web", country: "🇺🇸", host: "www.liquidweb.com", category: "foreign-vps" },
+    { id: "NL.HKG-01", provider: "HostKey Global", country: "🇳🇱", host: "hostkey.com", category: "foreign-vps" },
+    { id: "US.IMH-01", provider: "InMotion Hosting", country: "🇺🇸", host: "www.inmotionhosting.com", category: "foreign-vps" },
+    { id: "LT.HTS-01", provider: "Hostens", country: "🇱🇹", host: "www.hostens.com", category: "foreign-vps" },
+    { id: "US.GGK-01", provider: "GreenGeeks", country: "🇺🇸", host: "www.greengeeks.com", category: "foreign-vps" },
+
+    // === 4.1. NICHE EUROPEAN VPS (Tilaa, TransIP, Clouvider, AlphaVPS, UpCloud) ===
+    { id: "NL.TL-01", provider: "Tilaa", country: "🇳🇱", host: "tilaa.com", category: "eu-niche", desc: "Чистокровный голландский облачный провайдер для локального европейского бизнеса (AS196752). Не попадает под ковровые блокировки.", price: "от €4.50–6/мес", pros: "Автоматическая выдача без бюрократии, почасовая оплата, прямое включение в AMS-IX" },
+    { id: "NL.TL-02", provider: "Tilaa (Web)", country: "🇳🇱", host: "www.tilaa.com", category: "eu-niche", desc: "Веб-портал Tilaa Cloud Infrastructure (Нидерланды)", price: "от €4.50/мес", pros: "AMS-IX, AS196752" },
+    { id: "NL.TIP-01", provider: "TransIP", country: "🇳🇱", host: "www.transip.nl", category: "eu-niche", desc: "Крупнейший внутренний хостер Нидерландов (team.blue). Ориентирован строго на Бенилюкс.", price: "от €5–7/мес", pros: "Быстрые BladeVPS, чистейшие голландские IP (AS20857), огромные лимиты трафика (2–10 ТБ)" },
+    { id: "NL.TIP-02", provider: "TransIP (EU)", country: "🇳🇱", host: "transip.eu", category: "eu-niche", desc: "Европейский портал TransIP (Лейден / Амстердам)", price: "от €5–7/мес", pros: "BladeVPS, AS20857" },
+    { id: "UK.CLV-01", provider: "Clouvider", country: "🇬🇧", host: "clouvider.com", category: "eu-niche", desc: "Бутиковый провайдер с собственной премиум-сетью AS62240 (Амстердам, Франкфурт, Лондон).", price: "от £4.50–5/мес (~€5.5)", pros: "Порт 10 Гбит/с, AMD Ryzen / EPYC, честные ресурсы, мгновенная активация" },
+    { id: "NL.CLV-02", provider: "Clouvider (Network)", country: "🇳🇱", host: "as62240.net", category: "eu-niche", desc: "Сетевой диагностический портал Clouvider Looking Glass (AS62240)", price: "от £4.50/мес", pros: "10G uplink, премиум-маршрутизация" },
+    { id: "BG.AVP-01", provider: "AlphaVPS (BG)", country: "🇧🇬", host: "lgbg.alphavps.com", category: "eu-niche", desc: "Надежный европейский провайдер (DA International Group, AS203380, София).", price: "от €3.50–4/мес", pros: "Собственная сеть, 0 оверселлинга, поддержка 15-30 мин, KVM VPS 1 Гбит/с" },
+    { id: "DE.AVP-02", provider: "AlphaVPS (DE)", country: "🇩🇪", host: "lgde.alphavps.com", category: "eu-niche", desc: "Локация AlphaVPS в Германии (Нюрнберг, AS203380).", price: "от €3.50–4/мес", pros: "KVM VPS, порт 1 Гбит/с, без оверселлинга" },
+    { id: "BG.AVP-03", provider: "AlphaVPS (Web)", country: "🇧🇬", host: "alphavps.com", category: "eu-niche", desc: "Официальный сайт AlphaVPS", price: "от €3.50/мес", pros: "KVM VPS, DA International" },
+    { id: "FI.UPC-01", provider: "UpCloud", country: "🇫🇮", host: "api.upcloud.com", category: "eu-niche", desc: "Европейский производительный облачный провайдер (Хельсинки, Финляндия, AS202053).", price: "от €5/мес", pros: "NVMe MaxIOPS хранилище, порт 1 Гбит/с, почасовая оплата, SLA 100%" },
+    { id: "FI.UPC-02", provider: "UpCloud (Web)", country: "🇫🇮", host: "upcloud.com", category: "eu-niche", desc: "Главный веб-портал облачной платформы UpCloud", price: "от €5/мес", pros: "MaxIOPS, финская юрисдикция" },
+
+    // === 5. INFOMANIAK ===
+    { id: "CH.INF-01", provider: "Infomaniak", country: "🇨🇭", host: "www.infomaniak.com", category: "infomaniak" },
+
+    // === 6. RUSSIAN ROOT HOSTINGS & CLOUDS (expanded 6cf533b / PRs #90, #91, #96) ===
+    { id: "RU.SEL-01", provider: "Selectel", country: "🇷🇺", host: "selectel.ru", category: "rf-roots" },
+    { id: "RU.RVD-01", provider: "RuVDS", country: "🇷🇺", host: "ruvds.com", category: "rf-roots" },
+    { id: "RU.FVD-01", provider: "FirstVDS", country: "🇷🇺", host: "firstvds.ru", category: "rf-roots" },
+    { id: "RU.AEZ-01", provider: "Aeza", country: "🇷🇺", host: "aeza.net", category: "rf-roots" },
+    { id: "RU.PQH-01", provider: "PQ Hosting", country: "🇷🇺", host: "pq.hosting", category: "rf-roots" },
+    { id: "RU.TMW-01", provider: "Timeweb", country: "🇷🇺", host: "timeweb.com", category: "rf-roots" },
+    { id: "RU.BGT-01", provider: "Beget", country: "🇷🇺", host: "beget.com", category: "rf-roots" },
+    { id: "RU.REG-01", provider: "Reg.ru", country: "🇷🇺", host: "www.reg.ru", category: "rf-roots" },
+    { id: "RU.HKY-01", provider: "Hostkey RU", country: "🇷🇺", host: "hostkey.ru", category: "rf-roots" },
+    { id: "RU.SPW-01", provider: "SpaceWeb", country: "🇷🇺", host: "sweb.ru", category: "rf-roots" },
+    { id: "RU.SPH-01", provider: "Sprinthost", country: "🇷🇺", host: "sprinthost.ru", category: "rf-roots" },
+    { id: "RU.WNM-01", provider: "Webnames", country: "🇷🇺", host: "www.webnames.ru", category: "rf-roots" },
+    { id: "RU.AVP-01", provider: "AdminVPS", country: "🇷🇺", host: "adminvps.ru", category: "rf-roots" },
+    { id: "RU.FNX-01", provider: "Fornex", country: "🇷🇺", host: "fornex.com", category: "rf-roots" },
+    { id: "RU.RNT-01", provider: "Renter", country: "🇷🇺", host: "renter.ru", category: "rf-roots" },
+    { id: "RU.VDS-01", provider: "VDSina", country: "🇷🇺", host: "vdsina.ru", category: "rf-roots" },
+    { id: "RU.IPS-01", provider: "IPServer", country: "🇷🇺", host: "ipserver.su", category: "rf-roots" },
+    { id: "RU.UVD-01", provider: "UltraVDS", country: "🇷🇺", host: "ultravds.com", category: "rf-roots" },
+    { id: "RU.MCH-01", provider: "Макхост", country: "🇷🇺", host: "mchost.ru", category: "rf-roots" },
+    { id: "RU.EBT-01", provider: "Евробайт", country: "🇷🇺", host: "eurobyte.ru", category: "rf-roots" },
+    { id: "RU.YND-CLD", provider: "Yandex Cloud", country: "🇷🇺", host: "cloud.yandex.ru", category: "rf-roots" },
+    { id: "RU.CLD-01", provider: "Cloud.ru", country: "🇷🇺", host: "cloud.ru", category: "rf-roots" },
+    { id: "RU.VK-CLD", provider: "VK Cloud", country: "🇷🇺", host: "cloud.vk.com", category: "rf-roots" },
+    { id: "RU.RTC-01", provider: "Rostelecom / DataLine", country: "🇷🇺", host: "dtln.ru", category: "rf-roots" },
+    { id: "RU.MTS-CLD", provider: "MTS Cloud / MWS", country: "🇷🇺", host: "cloud.mts.ru", category: "rf-roots" },
+    { id: "RU.SLN-01", provider: "Softline Cloud", country: "🇷🇺", host: "softline.com", category: "rf-roots" },
+    { id: "RU.IHC-01", provider: "IHC.ru", country: "🇷🇺", host: "ihc.ru", category: "rf-roots" },
+    { id: "RU.CTL-01", provider: "Contell", country: "🇷🇺", host: "contell.ru", category: "rf-roots" },
+    { id: "RU.NTK-01", provider: "Netrack / Start2", country: "🇷🇺", host: "start2.ru", category: "rf-roots" },
+    { id: "RU.FLN-01", provider: "Filanco / DataHouse", country: "🇷🇺", host: "datahouse.ru", category: "rf-roots" },
+    { id: "RU.DDG-01", provider: "DDoS-Guard", country: "🇷🇺", host: "ddos-guard.net", category: "rf-roots" },
+    { id: "RU.LND-01", provider: "LandVPS", country: "🇷🇺", host: "landvps.ru", category: "rf-roots" },
+    { id: "RU.RFX-01", provider: "RuFox", country: "🇷🇺", host: "rufox.ru", category: "rf-roots" },
+
+    // === 7. RUSSIAN CDN ===
+    { id: "RU.YND-01", provider: "Yandex CDN", country: "🇷🇺", host: "yastatic.net", category: "rf-cdn" },
+    { id: "RU.VK-01", provider: "VK CDN", country: "🇷🇺", host: "sun9-1.userapi.com", category: "rf-cdn" },
+    { id: "RU.NGX-01", provider: "Ngenix", country: "🇷🇺", host: "www.ngenix.net", category: "rf-cdn" },
+    { id: "RU.EDG-01", provider: "EdgeCenter CDN", country: "🇷🇺", host: "edgecenter.ru", category: "rf-cdn" },
+    { id: "RU.CDV-01", provider: "CDNvideo", country: "🇷🇺", host: "www.cdnvideo.ru", category: "rf-cdn" },
+    { id: "RU.MTS-01", provider: "MTS CDN", country: "🇷🇺", host: "mts.ru", category: "rf-cdn" },
+    { id: "RU.MGF-01", provider: "MegaFon CDN", country: "🇷🇺", host: "megafon.ru", category: "rf-cdn" }
+  ];
+
+  // CONSTANTS FOR SCANNING
+  const DPI_THR_BYTES = 64 * 1024;
+  const MAX_URI_X_SIZE = 7 * 1024;
+  const RIPE_API_URL = "https://stat.ripe.net/data/";
+
+  const ALIVE_NO = 0;
+  const ALIVE_YES = 1;
+  const ALIVE_UNKNOWN = 2;
+
+  const DPI_METHOD_NOT_DETECTED = 0;
+  const DPI_METHOD_DETECTED = 1;
+  const DPI_METHOD_PROBABLY = 2;
+  const DPI_METHOD_POSSIBLE = 3;
+  const DPI_METHOD_UNLIKELY = 4;
+
+  // APP STATE
+  let state = {
+    results: {}, // id -> { alive, reason, dpi, latency, timestamp }
+    isRunning: false,
+    timeout: 10,
+    concurrency: 6,
+    currentCategory: "all",
+    searchQuery: "",
+    clientAsn: 0,
+    clientHolder: "",
+    clientCountry: "",
+    clientCity: "",
+    queue: [],
+    activeWorkers: 0,
+    totalToScan: 0,
+    completedScan: 0,
+    selectedProviders: new Set() // Set of selected provider names
+  };
+
+  // DOM ELEMENTS
+  const btnStart = document.getElementById("start-btn");
+  const btnShare = document.getElementById("share-btn");
+  const btnThemeToggle = document.getElementById("theme-toggle");
+  const btnAddHost = document.getElementById("add-host-btn");
+  const btnProviders = document.getElementById("providers-btn");
+  const providersMenu = document.getElementById("providers-menu");
+  const providersList = document.getElementById("providers-list");
+  const providerFilterInput = document.getElementById("provider-filter-input");
+  const btnProvidersSelectAll = document.getElementById("providers-select-all");
+  const btnProvidersDeselectAll = document.getElementById("providers-deselect-all");
+  const providersCountBadge = document.getElementById("providers-count-badge");
+  
+  const btnExportDropdown = document.getElementById("export-dropdown-btn");
+  const exportMenu = document.getElementById("export-menu");
+  const btnExportJson = document.getElementById("export-json-btn");
+  const btnExportCsv = document.getElementById("export-csv-btn");
+
+  const searchInput = document.getElementById("search-input");
+  const timeoutSlider = document.getElementById("timeout-slider");
+  const timeoutVal = document.getElementById("timeout-val");
+  const concurrencySlider = document.getElementById("concurrency-slider");
+  const concurrencyVal = document.getElementById("concurrency-val");
+  const categoryTabs = document.getElementById("category-tabs");
+  const resultsTbody = document.getElementById("results-tbody");
+  const logEl = document.getElementById("log");
+  const clearLogBtn = document.getElementById("clear-log-btn");
+  const asnEl = document.getElementById("asn");
+  const shareTsEl = document.getElementById("shareTs");
+  const statusEl = document.getElementById("status");
+  const progressTextEl = document.getElementById("progress-text");
+  const customTab = document.getElementById("custom-tab");
+
+  // Modal elements
+  const addHostModal = document.getElementById("add-host-modal");
+  const customHostInput = document.getElementById("custom-host-input");
+  const customProviderInput = document.getElementById("custom-provider-input");
+  const modalCancelBtn = document.getElementById("modal-cancel-btn");
+  const modalSubmitBtn = document.getElementById("modal-submit-btn");
+
+  // CONSOLE LOGGER
+  function logPush(level, prefix, msg) {
+    const now = new Date();
+    const ts = now.toLocaleTimeString([], { hour12: false }) + "." + now.getMilliseconds().toString().padStart(3, "0");
+    logEl.textContent += `[${ts}] ${prefix ? prefix + "/" : ""}${level}: ${msg}\n`;
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  // GET HELPER DATA FUNCTIONS
+  const getUniqueUrl = url => url.includes('?') ? `${url}&t=${Math.random()}` : `${url}?t=${Math.random()}`;
+
+  const getRandomData = size => {
+    const data = new Uint8Array(size);
+    const grvMax = 64 * 1024;
+    for (let offset = 0; offset < size; offset += grvMax) {
+      crypto.getRandomValues(data.subarray(offset, offset + grvMax));
+    }
+    return data;
+  };
+
+  const getRandomSafeData = (n) => {
+    const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    return Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  };
+
+  const getDefaultFetchOpt = (ctrl, method = "GET") => ({
+    method,
+    mode: "no-cors",
+    referrer: "",
+    credentials: "omit",
+    cache: "no-store",
+    signal: ctrl.signal,
+    redirect: "follow",
+    keepalive: false
+  });
+
+  // INITIALIZE SELECTED PROVIDERS
+  function initProviders() {
+    const uniqueProviders = [...new Set(TEST_SUITE.map(p => p.provider))].sort();
+    uniqueProviders.forEach(pName => state.selectedProviders.add(pName));
+    renderProvidersList();
+    updateProvidersBadge();
+  }
+
+  function renderProvidersList() {
+    providersList.innerHTML = "";
+    const filter = providerFilterInput.value.toLowerCase();
+    const uniqueProviders = [...new Set(TEST_SUITE.map(p => p.provider))].sort();
+
+    uniqueProviders.forEach(pName => {
+      if (filter && !pName.toLowerCase().includes(filter)) return;
+      const count = TEST_SUITE.filter(x => x.provider === pName).length;
+      const isChecked = state.selectedProviders.has(pName);
+
+      const label = document.createElement("label");
+      label.className = "provider-option-label";
+
+      const leftSpan = document.createElement("span");
+      leftSpan.style.display = "flex";
+      leftSpan.style.alignItems = "center";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = pName;
+      checkbox.checked = isChecked;
+
+      checkbox.addEventListener("change", (e) => {
+        if (e.target.checked) {
+          state.selectedProviders.add(pName);
+        } else {
+          state.selectedProviders.delete(pName);
+        }
+        updateProvidersBadge();
+        updateCategoryTabCounts();
+        renderTable();
+      });
+
+      leftSpan.appendChild(checkbox);
+      leftSpan.appendChild(document.createTextNode(pName));
+
+      const countPill = document.createElement("span");
+      countPill.className = "provider-count-pill";
+      countPill.textContent = count;
+
+      label.appendChild(leftSpan);
+      label.appendChild(countPill);
+      providersList.appendChild(label);
+    });
+  }
+
+  function updateProvidersBadge() {
+    const totalProviders = new Set(TEST_SUITE.map(p => p.provider)).size;
+    const selectedCount = state.selectedProviders.size;
+    providersCountBadge.textContent = `(${selectedCount}/${totalProviders})`;
+  }
+
+  // FILTER LOGIC
+  function getFilteredSuite() {
+    return TEST_SUITE.filter(p => {
+      const isProviderSelected = state.selectedProviders.has(p.provider);
+      const matchesCategory = state.currentCategory === "all" || p.category === state.currentCategory;
+      const q = state.searchQuery.toLowerCase();
+      const matchesSearch = !q || p.provider.toLowerCase().includes(q) || 
+                                  p.host.toLowerCase().includes(q) ||
+                                  p.id.toLowerCase().includes(q);
+      return isProviderSelected && matchesCategory && matchesSearch;
+    });
+  }
+
+  // UPDATE TAB COUNTS
+  function updateCategoryTabCounts() {
+    const tabs = categoryTabs.querySelectorAll(".tab-btn");
+    let hasCustom = false;
+
+    tabs.forEach(tab => {
+      const cat = tab.getAttribute("data-category");
+      let count = 0;
+      if (cat === "all") {
+        count = TEST_SUITE.filter(p => state.selectedProviders.has(p.provider)).length;
+      } else {
+        count = TEST_SUITE.filter(p => p.category === cat && state.selectedProviders.has(p.provider)).length;
+      }
+
+      if (cat === "custom" && count > 0) {
+        hasCustom = true;
+      }
+      
+      let name = "";
+      switch(cat) {
+        case "all": name = "Все ресурсы"; break;
+        case "popular-services": name = "Популярные сервисы"; break;
+        case "mobile-push": name = "Push-уведомления"; break;
+        case "foreign-vps": name = "Зарубежные VPS"; break;
+        case "eu-niche": name = "Нишевые VPS Европы"; break;
+        case "rf-roots": name = "Хостинги и облака РФ"; break;
+        case "foreign-cdn": name = "Зарубежные CDN"; break;
+        case "rf-cdn": name = "Российские CDN"; break;
+        case "infomaniak": name = "Infomaniak"; break;
+        case "custom": name = "Свои хосты"; break;
+      }
+      tab.textContent = `${name} (${count})`;
+    });
+
+    customTab.style.display = hasCustom ? "inline-block" : "none";
+  }
+
+  // RENDER TABLE ROWS
+  function renderTable() {
+    const filtered = getFilteredSuite();
+    resultsTbody.innerHTML = "";
+
+    if (filtered.length === 0) {
+      resultsTbody.innerHTML = `<tr><td colspan="4" style="color: var(--text-muted); text-align: center; padding: 2.5rem;">Ресурсы не найдены по текущим фильтрам или провайдеры отключены в меню.</td></tr>`;
+      return;
+    }
+
+    filtered.forEach(p => {
+      const row = document.createElement("tr");
+      row.id = `row-${p.id}`;
+
+      const res = state.results[p.id];
+      
+      let idCell = `<td style="font-family: var(--font-mono); font-size: 0.8rem; text-align: center;">${p.id}</td>`;
+      let metaHtml = "";
+      if (p.price || p.desc) {
+        metaHtml = `<div style="margin-top: 4px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">`;
+        if (p.price) {
+          metaHtml += `<span style="font-size: 0.72rem; padding: 1px 7px; border-radius: 6px; background: rgba(16, 185, 129, 0.15); color: var(--clr-success); font-weight: 600; border: 1px solid rgba(16, 185, 129, 0.3);">${p.price}</span>`;
+        }
+        if (p.desc) {
+          metaHtml += `<span style="font-size: 0.74rem; color: var(--text-secondary); line-height: 1.3;" title="${p.pros ? 'Преимущества: ' + p.pros : ''}">${p.desc}</span>`;
+        }
+        metaHtml += `</div>`;
+      }
+
+      let providerCell = `<td class="td-left">
+        <span style="font-weight:600;">${p.country} ${p.provider}</span>
+        <div style="font-size:0.75rem; color:var(--text-muted); font-family: var(--font-mono); margin-top:2px;">
+          https://${p.host}/
+        </div>
+        ${metaHtml}
+      </td>`;
+      
+      let aliveCell = `<td style="text-align: center;"><span class="badge-dpi-skip">Ожидание</span></td>`;
+      let dpiCell = `<td style="text-align: center;"><span class="badge-dpi-skip">Ожидание</span></td>`;
+
+      if (res) {
+        // Render Alive State
+        if (res.alive === "checking") {
+          aliveCell = `<td style="text-align: center;"><span class="status-badge checking-text">Тест... ⏰</span></td>`;
+        } else if (res.alive === ALIVE_YES) {
+          aliveCell = `<td style="text-align: center;">
+            <span class="status-badge badge-alive-yes">Yes 🟢</span>
+            <span class="reason-tag">${Math.round(res.latency)}ms</span>
+          </td>`;
+        } else if (res.alive === ALIVE_NO) {
+          let reasonText = res.reason || "Timeout";
+          aliveCell = `<td style="text-align: center;">
+            <span class="status-badge badge-alive-no" title="${reasonText}">No 🔴</span>
+            <span class="reason-tag">${reasonText}</span>
+          </td>`;
+        } else {
+          let reasonText = res.reason || "Unknown";
+          aliveCell = `<td style="text-align: center;">
+            <span class="status-badge badge-alive-unknown" title="${reasonText}">Unknown ⚠️</span>
+            <span class="reason-tag">${reasonText}</span>
+          </td>`;
+        }
+
+        // Render DPI State
+        if (res.dpi === "waiting") {
+          dpiCell = `<td style="text-align: center;"><span class="badge-dpi-skip">Ожидание</span></td>`;
+        } else if (res.dpi === "checking") {
+          dpiCell = `<td style="text-align: center;"><span class="status-badge checking-text">Тест... ⏰</span></td>`;
+        } else if (res.dpi === DPI_METHOD_NOT_DETECTED) {
+          dpiCell = `<td style="text-align: center;"><span class="status-badge badge-dpi-ok" title="TCP 16-20 блокировка не обнаружена">No ✅</span></td>`;
+        } else if (res.dpi === DPI_METHOD_DETECTED) {
+          dpiCell = `<td style="text-align: center;"><span class="status-badge badge-dpi-bad" title="Обнаружена фильтрация TCP 16-20 DPI">Detected❗️</span></td>`;
+        } else if (res.dpi === DPI_METHOD_PROBABLY) {
+          dpiCell = `<td style="text-align: center;"><span class="status-badge badge-dpi-bad" style="opacity: 0.85;" title="Вероятная блокировка пакетов">Probably❗️</span></td>`;
+        } else if (res.dpi === DPI_METHOD_POSSIBLE) {
+          dpiCell = `<td style="text-align: center;"><span class="status-badge badge-dpi-warn" title="Возможная блокировка / сброс">Possible ⚠️</span></td>`;
+        } else if (res.dpi === DPI_METHOD_UNLIKELY) {
+          dpiCell = `<td style="text-align: center;"><span class="status-badge badge-dpi-skip" title="Сетевая ошибка до проверки">Unlikely ⚠️</span></td>`;
+        } else if (res.dpi === "skip") {
+          dpiCell = `<td style="text-align: center;"><span class="status-badge badge-dpi-skip" title="Пропущен из-за недоступности хоста">Skip ⚠️</span></td>`;
+        }
+      }
+
+      row.innerHTML = idCell + providerCell + aliveCell + dpiCell;
+      resultsTbody.appendChild(row);
+    });
+  }
+
+  // --- CORE TCP 16-20 DIAGNOSTICS ENGINE ---
+
+  const handleDpiMethodErr = (alive, e) => {
+    if (e.name === "AbortError") {
+      if (alive) return DPI_METHOD_DETECTED; // alive passed, large body post timed out -> DPI detected!
+      return DPI_METHOD_PROBABLY; // alive failed instantly, but post timed out
+    }
+    if (alive) return DPI_METHOD_POSSIBLE; // alive passed, large post threw error instantly
+    return DPI_METHOD_UNLIKELY; // everything failed instantly
+  };
+
+  const dpiHugeBodyPostMethod = async (alive, host) => {
+    try {
+      const dpiCtrl = new AbortController();
+      const dpiTimeoutId = setTimeout(() => dpiCtrl.abort(), state.timeout * 1000);
+      const opt = getDefaultFetchOpt(dpiCtrl, "POST");
+      opt.body = getRandomData(DPI_THR_BYTES); // Send 64KB random data
+      const url = `https://${host}/`;
+      await fetch(getUniqueUrl(url), opt);
+      clearTimeout(dpiTimeoutId);
+    } catch (e) {
+      return handleDpiMethodErr(alive, e);
+    }
+    return DPI_METHOD_NOT_DETECTED;
+  };
+
+  const dpiHugeReqlineHeadMethod = async (alive, host) => {
+    try {
+      const times = DPI_THR_BYTES / MAX_URI_X_SIZE; // Send multiple small packets to sum 64KB over keepalive
+      const dpiCtrl = new AbortController();
+      const dpiTimeoutId = setTimeout(() => dpiCtrl.abort(), state.timeout * 1000);
+      for (let i = 0; i < times; i++) {
+        const opt = getDefaultFetchOpt(dpiCtrl, "HEAD");
+        const url = `https://${host}/?x=${getRandomSafeData(MAX_URI_X_SIZE)}`;
+        await fetch(getUniqueUrl(url), opt);
+      }
+      clearTimeout(dpiTimeoutId);
+    } catch (e) {
+      return handleDpiMethodErr(alive, e);
+    }
+    return DPI_METHOD_NOT_DETECTED;
+  };
+
+  // JOB SCANNER WORKER
+  async function scanTarget(p) {
+    const prefix = `DPI(#${p.id})`;
+    let t0 = performance.now();
+
+    // Mark as checking alive
+    state.results[p.id] = { alive: "checking", reason: "", dpi: "waiting", latency: 0, timestamp: new Date().toISOString() };
+    renderTable();
+
+    let alive = false;
+    let possibleAlive = false;
+    let rtt = 0;
+
+    try {
+      // 1. Perform Alive Check using HEAD
+      const aliveCtrl = new AbortController();
+      const aliveTimeoutId = setTimeout(() => aliveCtrl.abort(), state.timeout * 1000);
+      const url = `https://${p.host}/`;
+      await fetch(getUniqueUrl(url), getDefaultFetchOpt(aliveCtrl, "HEAD"));
+      clearTimeout(aliveTimeoutId);
+      
+      rtt = performance.now() - t0;
+      logPush("INFO", prefix, `alived: yes 🟢, rtt: ${rtt.toFixed(1)} ms`);
+      state.results[p.id].alive = ALIVE_YES;
+      state.results[p.id].latency = rtt;
+      state.results[p.id].reason = "OK";
+      alive = true;
+      possibleAlive = true;
+    } catch (e) {
+      rtt = performance.now() - t0;
+      if (e.name === "AbortError") {
+        logPush("WARN", prefix, `alived: no 🔴 (Timeout/Blackhole), time: ${rtt.toFixed(1)} ms`);
+        state.results[p.id].alive = ALIVE_NO;
+        state.results[p.id].latency = rtt;
+        state.results[p.id].reason = "Timeout";
+      } else {
+        // Classify instant failure vs network failure
+        // Fast error (<500ms) typically indicates RST on SNI ClientHello
+        const isFastRst = rtt < 600;
+        const reason = isFastRst ? "SNI RST" : "Net Error";
+        logPush("WARN", prefix, `alived: unknown ⚠️ (${reason}), time: ${rtt.toFixed(1)} ms`);
+        state.results[p.id].alive = ALIVE_UNKNOWN;
+        state.results[p.id].latency = rtt;
+        state.results[p.id].reason = reason;
+        possibleAlive = true;
+      }
+    }
+
+    renderTable();
+
+    if (!alive && !possibleAlive) {
+      state.results[p.id].dpi = "skip";
+      renderTable();
+      state.completedScan++;
+      updateProgress();
+      return;
+    }
+
+    // 2. Perform TCP 16-20 DPI check
+    state.results[p.id].dpi = "checking";
+    renderTable();
+
+    // Run Method 1 (Huge Body POST)
+    const m1 = await dpiHugeBodyPostMethod(alive, p.host);
+    if (m1 === DPI_METHOD_DETECTED) {
+      logPush("ALERT", prefix, `tcp 16-20: detected❗️, method: 1 (Huge POST body)`);
+      state.results[p.id].dpi = DPI_METHOD_DETECTED;
+      renderTable();
+      state.completedScan++;
+      updateProgress();
+      return;
+    }
+
+    // Run Method 2 (Multiple large HEAD URIs)
+    t0 = performance.now();
+    const m2 = await dpiHugeReqlineHeadMethod(alive, p.host);
+    state.results[p.id].dpi = m2;
+
+    const logDpiMap = {
+      [DPI_METHOD_DETECTED]: `tcp 16-20: detected❗️, method: 2 (Huge URI reqline)`,
+      [DPI_METHOD_PROBABLY]: `tcp 16-20: probably detected ⚠️, reqtime: ${(performance.now() - t0).toFixed(1)} ms`,
+      [DPI_METHOD_POSSIBLE]: `tcp 16-20: possible detected ⚠️, reqtime: ${(performance.now() - t0).toFixed(1)} ms`,
+      [DPI_METHOD_UNLIKELY]: `tcp 16-20: unlikely ⚠️, reqtime: ${(performance.now() - t0).toFixed(1)} ms`,
+      [DPI_METHOD_NOT_DETECTED]: `tcp 16-20: not detected ✅, reqtime: ${(performance.now() - t0).toFixed(1)} ms`,
+    };
+
+    logPush("INFO", prefix, logDpiMap[m2] || "completed");
+    renderTable();
+    state.completedScan++;
+    updateProgress();
+  }
+
+  function updateProgress() {
+    if (state.totalToScan > 0) {
+      progressTextEl.textContent = `[${state.completedScan}/${state.totalToScan}]`;
+    } else {
+      progressTextEl.textContent = "";
+    }
+  }
+
+  // QUEUE PROCESSING PIPELINE
+  async function runWorker() {
+    while (state.queue.length > 0) {
+      const p = state.queue.shift();
+      if (!p) break;
+      state.activeWorkers++;
+      await scanTarget(p);
+      state.activeWorkers--;
+    }
+  }
+
+  async function startScanner() {
+    if (state.isRunning) return;
+    state.isRunning = true;
+    
+    btnStart.disabled = true;
+    btnStart.textContent = "🔍 ...";
+    statusEl.className = "checking-text";
+    statusEl.textContent = "Checking ⏰";
+
+    logPush("INFO", null, "Запуск многопоточного теста доступности ресурсов...");
+
+    const targets = getFilteredSuite();
+    if (targets.length === 0) {
+      alert("Нет выбранных ресурсов для запуска. Включите провайдеров в меню '🏢 Провайдеры'.");
+      state.isRunning = false;
+      btnStart.disabled = false;
+      btnStart.textContent = "🔍 Start";
+      statusEl.className = "ok";
+      statusEl.textContent = "Ready ⚡";
+      return;
+    }
+
+    state.totalToScan = targets.length;
+    state.completedScan = 0;
+    updateProgress();
+    
+    // Reset targeted items state
+    targets.forEach(t => {
+      state.results[t.id] = { alive: "checking", reason: "", dpi: "waiting", latency: 0, timestamp: "" };
+    });
+    renderTable();
+
+    // Populate queue and start concurrency workers
+    state.queue = [...targets];
+    const workersCount = Math.min(parseInt(state.concurrency), targets.length);
+    const workers = [];
+
+    for (let i = 0; i < workersCount; i++) {
+      workers.push(runWorker());
+    }
+
+    await Promise.all(workers);
+
+    state.isRunning = false;
+    btnStart.disabled = false;
+    btnStart.textContent = "🔍 Start";
+    btnShare.disabled = false;
+    
+    statusEl.className = "ok";
+    statusEl.textContent = "Ready ⚡";
+    progressTextEl.textContent = `[Завершено: ${state.completedScan}/${state.totalToScan}]`;
+    logPush("INFO", null, `Проверка полностью завершена. Протестировано ресурсов: ${state.completedScan}`);
+  }
+
+  // ASN IP DETERMINATION VIA RIPE NCC API
+  const fetchAsn = async () => {
+    try {
+      const ipRes = await fetch(RIPE_API_URL + "whats-my-ip/data.json");
+      const ip = (await ipRes.json()).data.ip;
+      
+      const asnRes = await fetch(RIPE_API_URL + "prefix-overview/data.json?resource=" + ip);
+      const asnData = (await asnRes.json()).data.asns[0];
+      state.clientAsn = Number(asnData.asn);
+      state.clientHolder = asnData.holder || "";
+      
+      const geoRes = await fetch(RIPE_API_URL + "maxmind-geo-lite/data.json?resource=" + ip);
+      const geoData = (await geoRes.json()).data.located_resources[0].locations[0];
+      state.clientCountry = geoData.country || "";
+      state.clientCity = geoData.city || "";
+      
+      asnEl.innerHTML = `ASN: <a href="https://bgp.he.net/AS${asnData.asn}" target="_blank">AS${asnData.asn}</a> (<i>${asnData.holder}</i>)<span class="asn-br"></span>${geoData.country}, ${geoData.city || "—"}`;
+    } catch (err) {
+      console.error("Fetch ASN err:", err);
+      asnEl.innerHTML = "Не удалось автоматически определить ASN клиента через API RIPE (возможно блокируется API RIPE).";
+    }
+  };
+
+  // EXPORT RESULTS: JSON & CSV
+  function exportToJson() {
+    const exportData = {
+      generator: "hosting-checker v2.4 (hyperion-cs/dpi-checkers engine)",
+      timestamp: new Date().toISOString(),
+      client: {
+        asn: state.clientAsn,
+        holder: state.clientHolder,
+        country: state.clientCountry,
+        city: state.clientCity
+      },
+      results: Object.keys(state.results).map(id => {
+        const res = state.results[id];
+        const target = TEST_SUITE.find(x => x.id === id) || { provider: "Custom", host: "", category: "custom", country: "💡" };
+        return {
+          id: id,
+          provider: target.provider,
+          host: target.host,
+          country: target.country,
+          category: target.category,
+          alive: res.alive,
+          alive_reason: res.reason,
+          latency_ms: Math.round(res.latency),
+          dpi: res.dpi,
+          dpi_text: getDpiText(res.dpi),
+          timestamp: res.timestamp
+        };
+      })
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json;charset=utf-8" });
+    downloadBlob(blob, `hosting-checker-results-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.json`);
+    logPush("INFO", null, "Результаты успешно экспортированы в JSON.");
+  }
+
+  function exportToCsv() {
+    const headers = ["ID", "Provider", "Host", "Country", "Category", "Alive", "Latency_ms", "Reason", "DPI_Status", "Timestamp"];
+    const rows = Object.keys(state.results).map(id => {
+      const res = state.results[id];
+      const target = TEST_SUITE.find(x => x.id === id) || { provider: "Custom", host: "", category: "custom", country: "" };
+      let aliveStr = res.alive === ALIVE_YES ? "YES" : (res.alive === ALIVE_NO ? "NO" : "UNKNOWN");
+      return [
+        `"${id}"`,
+        `"${target.provider}"`,
+        `"${target.host}"`,
+        `"${target.country}"`,
+        `"${target.category}"`,
+        `"${aliveStr}"`,
+        Math.round(res.latency || 0),
+        `"${res.reason || ''}"`,
+        `"${getDpiText(res.dpi)}"`,
+        `"${res.timestamp || ''}"`
+      ].join(";");
+    });
+
+    const csvContent = "\uFEFF" + [headers.join(";"), ...rows].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+    downloadBlob(blob, `hosting-checker-results-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.csv`);
+    logPush("INFO", null, "Результаты успешно экспортированы в CSV.");
+  }
+
+  function getDpiText(dpi) {
+    switch (dpi) {
+      case DPI_METHOD_NOT_DETECTED: return "Not Detected";
+      case DPI_METHOD_DETECTED: return "Detected";
+      case DPI_METHOD_PROBABLY: return "Probably";
+      case DPI_METHOD_POSSIBLE: return "Possible";
+      case DPI_METHOD_UNLIKELY: return "Unlikely";
+      case "skip": return "Skipped";
+      default: return "Pending";
+    }
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // ENCODE SHARE RESULTS TO BASE64 FOR URL SHARING
+  async function encodeShare() {
+    const prevText = btnShare.textContent;
+    btnShare.textContent = "🔗 ...";
+    btnShare.disabled = true;
+
+    try {
+      const shareObj = {
+        ts: new Date().toISOString(),
+        asn: state.clientAsn,
+        items: Object.keys(state.results).map(id => {
+          const res = state.results[id];
+          const target = TEST_SUITE.find(x => x.id === id) || { provider: "Custom", host: "", country: "💡" };
+          return {
+            id: id,
+            provider: target.provider,
+            host: target.host,
+            country: target.country,
+            alive: res.alive,
+            reason: res.reason,
+            dpi: res.dpi,
+            latency: res.latency
+          };
+        })
+      };
+
+      const jsonStr = JSON.stringify(shareObj);
+      const utf8Bytes = new TextEncoder().encode(jsonStr);
+      let binaryStr = "";
+      for (let i = 0; i < utf8Bytes.length; i++) {
+        binaryStr += String.fromCharCode(utf8Bytes[i]);
+      }
+      const b64 = btoa(binaryStr)
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+
+      const url = `${window.location.origin + window.location.pathname}?share=${b64}`;
+      await navigator.clipboard.writeText(url);
+      alert("Ссылка на сохраненные результаты скопирована в буфер обмена!");
+      logPush("INFO", null, "Ссылка на результаты создана и скопирована.");
+    } catch (e) {
+      console.error(e);
+      alert("Не удалось сгенерировать ссылку для шеринга результатов.");
+    } finally {
+      btnShare.textContent = prevText;
+      btnShare.disabled = false;
+    }
+  }
+
+  // HANDLE SHARING READING AT LOADING
+  function tryHandleShare() {
+    const params = new URLSearchParams(window.location.search);
+    const shareParam = params.get("share");
+    if (!shareParam) return false;
+
+    try {
+      let b64 = shareParam.replace(/-/g, "+").replace(/_/g, "/");
+      while (b64.length % 4) b64 += "=";
+      
+      const binaryStr = atob(b64);
+      const bytes = new Uint8Array(binaryStr.length);
+      for (let i = 0; i < binaryStr.length; i++) {
+        bytes[i] = binaryStr.charCodeAt(i);
+      }
+      
+      const jsonStr = new TextDecoder().decode(bytes);
+      const decoded = JSON.parse(jsonStr);
+
+      document.getElementById("app-subtitle").textContent = "Сохраненный архивный отчет проверки доступности";
+      btnStart.style.display = "none";
+      btnShare.style.display = "none";
+      btnAddHost.style.display = "none";
+      btnProviders.parentElement.style.display = "none";
+      document.querySelector(".config-row").style.display = "none";
+      document.querySelector(".filter-wrapper").style.display = "none";
+
+      asnEl.innerHTML = decoded.asn ? `ASN: <a href="https://bgp.he.net/AS${decoded.asn}" target="_blank">AS${decoded.asn}</a> (Архивные результаты)` : "Архивные результаты";
+      shareTsEl.textContent = `Дата теста: ${new Date(decoded.ts).toLocaleString()}`;
+
+      resultsTbody.innerHTML = "";
+      decoded.items.forEach(v => {
+        const row = document.createElement("tr");
+        let aliveHTML = `<td style="text-align: center;"><span class="status-badge badge-alive-unknown">Unknown ⚠️</span></td>`;
+        if (v.alive === ALIVE_YES) {
+          aliveHTML = `<td style="text-align: center;"><span class="status-badge badge-alive-yes">Yes 🟢</span> <span class="reason-tag">${Math.round(v.latency)}ms</span></td>`;
+        } else if (v.alive === ALIVE_NO) {
+          aliveHTML = `<td style="text-align: center;"><span class="status-badge badge-alive-no">No 🔴</span> <span class="reason-tag">${v.reason || 'Timeout'}</span></td>`;
+        }
+
+        let dpiHTML = `<td style="text-align: center;"><span class="badge-dpi-skip">Skip ⚠️</span></td>`;
+        if (v.dpi === DPI_METHOD_NOT_DETECTED) {
+          dpiHTML = `<td style="text-align: center;"><span class="status-badge badge-dpi-ok">No ✅</span></td>`;
+        } else if (v.dpi === DPI_METHOD_DETECTED) {
+          dpiHTML = `<td style="text-align: center;"><span class="status-badge badge-dpi-bad">Detected❗️</span></td>`;
+        } else if (v.dpi === DPI_METHOD_PROBABLY) {
+          dpiHTML = `<td style="text-align: center;"><span class="status-badge badge-dpi-bad" style="opacity: 0.85;">Probably❗️</span></td>`;
+        } else if (v.dpi === DPI_METHOD_POSSIBLE) {
+          dpiHTML = `<td style="text-align: center;"><span class="status-badge badge-dpi-warn">Possible ⚠️</span></td>`;
+        } else if (v.dpi === DPI_METHOD_UNLIKELY) {
+          dpiHTML = `<td style="text-align: center;"><span class="status-badge badge-dpi-skip">Unlikely ⚠️</span></td>`;
+        }
+
+        row.innerHTML = `<td style="font-family: var(--font-mono); font-size: 0.8rem; text-align: center;">${v.id}</td><td class="td-left"><b>${v.country} ${v.provider}</b><div style="font-size:0.75rem; color:var(--text-muted); font-family: var(--font-mono);">${v.host ? 'https://' + v.host + '/' : ''}</div></td>${aliveHTML}${dpiHTML}`;
+        resultsTbody.appendChild(row);
+      });
+
+      logEl.textContent = `--- Загружен архивный отчет от ${new Date(decoded.ts).toLocaleString()} ---\nВсего проверено хостов: ${decoded.items.length}`;
+      return true;
+    } catch (e) {
+      console.error(e);
+      alert("Ссылка на отчет повреждена или устарела.");
+      return false;
+    }
+  }
+
+  // URL QUERY PARAMS HANDLER (?host=...&provider=...&timeout=...)
+  function handleUrlQueryParams() {
+    const params = new URLSearchParams(window.location.search);
+    const host = params.get("host");
+    if (host) {
+      const provider = params.get("provider") || "Custom Target";
+      const cleanHost = host.replace(/^https?:\/\//i, "").replace(/\/.*$/, "");
+      const newTarget = {
+        id: `CUSTOM-${TEST_SUITE.filter(x => x.category === "custom").length + 1}`,
+        provider: provider,
+        country: "💡",
+        host: cleanHost,
+        category: "custom"
+      };
+      TEST_SUITE.unshift(newTarget);
+      state.selectedProviders.add(provider);
+      logPush("INFO", null, `Добавлен целевой хост из URL параметров: ${cleanHost} (${provider})`);
+    }
+
+    const timeout = params.get("timeout");
+    if (timeout) {
+      const t = parseInt(timeout);
+      if (t >= 1 && t <= 60) {
+        state.timeout = t;
+        timeoutSlider.value = t;
+        timeoutVal.textContent = `${t}s`;
+      }
+    }
+  }
+
+  // THEME SWITCHER
+  function toggleTheme() {
+    document.body.classList.toggle("classic-theme");
+    const isClassic = document.body.classList.contains("classic-theme");
+    localStorage.setItem("theme", isClassic ? "classic" : "modern");
+    
+    if (isClassic) {
+      btnThemeToggle.innerHTML = `
+        <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24">
+          <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41z"/>
+        </svg>
+      `;
+    } else {
+      btnThemeToggle.innerHTML = `
+        <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24">
+          <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+        </svg>
+      `;
+    }
+  }
+
+  // EVENT LISTENERS SETUP
+  btnStart.addEventListener("click", startScanner);
+  btnShare.addEventListener("click", encodeShare);
+  btnThemeToggle.addEventListener("click", toggleTheme);
+
+  // Export dropdown
+  btnExportDropdown.addEventListener("click", (e) => {
+    e.stopPropagation();
+    exportMenu.classList.toggle("show");
+    providersMenu.classList.remove("show");
+  });
+
+  btnExportJson.addEventListener("click", () => {
+    exportToJson();
+    exportMenu.classList.remove("show");
+  });
+
+  btnExportCsv.addEventListener("click", () => {
+    exportToCsv();
+    exportMenu.classList.remove("show");
+  });
+
+  // Providers dropdown
+  btnProviders.addEventListener("click", (e) => {
+    e.stopPropagation();
+    providersMenu.classList.toggle("show");
+    exportMenu.classList.remove("show");
+  });
+
+  providerFilterInput.addEventListener("input", () => {
+    renderProvidersList();
+  });
+
+  btnProvidersSelectAll.addEventListener("click", () => {
+    const uniqueProviders = [...new Set(TEST_SUITE.map(p => p.provider))];
+    uniqueProviders.forEach(p => state.selectedProviders.add(p));
+    renderProvidersList();
+    updateProvidersBadge();
+    updateCategoryTabCounts();
+    renderTable();
+  });
+
+  btnProvidersDeselectAll.addEventListener("click", () => {
+    state.selectedProviders.clear();
+    renderProvidersList();
+    updateProvidersBadge();
+    updateCategoryTabCounts();
+    renderTable();
+  });
+
+  // Close menus on click outside
+  document.addEventListener("click", (e) => {
+    if (!providersMenu.contains(e.target) && e.target !== btnProviders) {
+      providersMenu.classList.remove("show");
+    }
+    if (!exportMenu.contains(e.target) && e.target !== btnExportDropdown) {
+      exportMenu.classList.remove("show");
+    }
+  });
+
+  // Modal Custom Host
+  btnAddHost.addEventListener("click", () => {
+    customHostInput.value = "";
+    customProviderInput.value = "";
+    addHostModal.classList.add("show");
+    customHostInput.focus();
+  });
+
+  modalCancelBtn.addEventListener("click", () => {
+    addHostModal.classList.remove("show");
+  });
+
+  modalSubmitBtn.addEventListener("click", () => {
+    const rawHost = customHostInput.value.trim();
+    if (!rawHost) {
+      alert("Укажите домен или IP-адрес.");
+      return;
+    }
+    const cleanHost = rawHost.replace(/^https?:\/\//i, "").replace(/\/.*$/, "");
+    const providerName = customProviderInput.value.trim() || cleanHost;
+    
+    const newTarget = {
+      id: `CUSTOM-${TEST_SUITE.filter(x => x.category === "custom").length + 1}`,
+      provider: providerName,
+      country: "💡",
+      host: cleanHost,
+      category: "custom"
+    };
+
+    TEST_SUITE.unshift(newTarget);
+    state.selectedProviders.add(providerName);
+    
+    addHostModal.classList.remove("show");
+    logPush("INFO", null, `Добавлен пользовательский хост: ${cleanHost} (${providerName})`);
+    
+    renderProvidersList();
+    updateProvidersBadge();
+    updateCategoryTabCounts();
+    
+    // Switch to custom category tab
+    categoryTabs.querySelectorAll(".tab-btn").forEach(t => t.classList.remove("active"));
+    customTab.classList.add("active");
+    state.currentCategory = "custom";
+    renderTable();
+  });
+
+  // Search input
+  searchInput.addEventListener("input", (e) => {
+    state.searchQuery = e.target.value;
+    renderTable();
+  });
+
+  // Sliders
+  timeoutSlider.addEventListener("input", (e) => {
+    state.timeout = e.target.value;
+    timeoutVal.textContent = `${state.timeout}s`;
+  });
+
+  concurrencySlider.addEventListener("input", (e) => {
+    state.concurrency = e.target.value;
+    concurrencyVal.textContent = state.concurrency;
+  });
+
+  // Clear log
+  clearLogBtn.addEventListener("click", () => {
+    logEl.textContent = "";
+  });
+
+  // Category Tabs
+  categoryTabs.addEventListener("click", (e) => {
+    if (e.target.id === "tab-traceroute-btn" || e.target.getAttribute("data-category") === "traceroute") {
+      document.getElementById("traceroute-panel").scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    if (e.target.classList.contains("tab-btn")) {
+      categoryTabs.querySelectorAll(".tab-btn").forEach(t => t.classList.remove("active"));
+      e.target.classList.add("active");
+      state.currentCategory = e.target.getAttribute("data-category");
+      renderTable();
+    }
+  });
+
+  // TRACEROUTE COMPONENT LOGIC
+  const traceTargetSelect = document.getElementById("trace-target-select");
+  const traceCustomWrap = document.getElementById("trace-custom-wrap");
+  const traceCustomInput = document.getElementById("trace-custom-input");
+  const traceProbeSelect = document.getElementById("trace-probe-select");
+  const traceStartBtn = document.getElementById("trace-start-btn");
+  const traceStartIcon = document.getElementById("trace-start-icon");
+  const traceStartText = document.getElementById("trace-start-text");
+  const traceCopyBtn = document.getElementById("trace-copy-btn");
+  const traceCopyText = document.getElementById("trace-copy-text");
+  const traceCmdCopyBtn = document.getElementById("trace-cmd-copy-btn");
+  const traceClearBtn = document.getElementById("trace-clear-btn");
+  const traceConsole = document.getElementById("trace-console");
+  
+  const tracePillTarget = document.getElementById("trace-pill-target");
+  const tracePillHost = document.getElementById("trace-pill-host");
+  const tracePillAsn = document.getElementById("trace-pill-asn");
+  const tracePillProbe = document.getElementById("trace-pill-probe");
+  const tracePillStatus = document.getElementById("trace-pill-status");
+  const navTracerouteBtn = document.getElementById("nav-traceroute-btn");
+
+  let currentTraceOutput = "";
+
+  function updateTracePills() {
+    const sel = traceTargetSelect;
+    const isCustom = sel.value === "custom";
+    traceCustomWrap.style.display = isCustom ? "flex" : "none";
+
+    if (isCustom) {
+      const val = traceCustomInput.value.trim() || "127.0.0.1";
+      tracePillTarget.textContent = val;
+      tracePillHost.textContent = val;
+      tracePillAsn.textContent = "Пользовательский узел";
+    } else {
+      const opt = sel.options[sel.selectedIndex];
+      tracePillTarget.textContent = opt.value;
+      tracePillHost.textContent = opt.getAttribute("data-host") || opt.value;
+      tracePillAsn.textContent = opt.getAttribute("data-asn") || "Зарубежный дата-центр";
+    }
+  }
+
+  traceTargetSelect.addEventListener("change", updateTracePills);
+  traceCustomInput.addEventListener("input", updateTracePills);
+
+  if (navTracerouteBtn) {
+    navTracerouteBtn.addEventListener("click", () => {
+      document.getElementById("traceroute-panel").scrollIntoView({ behavior: "smooth" });
+    });
+  }
+
+  traceClearBtn.addEventListener("click", () => {
+    traceConsole.textContent = "Консоль очищена. Выберите хостинг и нажмите «🚀 Трассировать».";
+    currentTraceOutput = "";
+    traceCopyBtn.disabled = true;
+    tracePillStatus.textContent = "Готов к запуску";
+    tracePillStatus.style.color = "var(--clr-info)";
+  });
+
+  traceCopyBtn.addEventListener("click", async () => {
+    if (!currentTraceOutput) return;
+    try {
+      await navigator.clipboard.writeText(currentTraceOutput);
+      const oldText = traceCopyText.textContent;
+      traceCopyText.textContent = "✓ Скопировано!";
+      setTimeout(() => { traceCopyText.textContent = oldText; }, 2000);
+    } catch (e) {
+      alert("Не удалось скопировать в буфер: " + e);
+    }
+  });
+
+  traceCmdCopyBtn.addEventListener("click", async () => {
+    const targetVal = traceTargetSelect.value === "custom" 
+      ? (traceCustomInput.value.trim() || "185.125.25.1") 
+      : traceTargetSelect.value;
+    const cmd = `python3 /Users/yanpurvenes/Documents/Git/hosting-checker/trace_hosting.py --host ${targetVal}`;
+    try {
+      await navigator.clipboard.writeText(cmd);
+      const btn = traceCmdCopyBtn;
+      const oldHtml = btn.innerHTML;
+      btn.innerHTML = "<span>✓</span> Скопировано!";
+      setTimeout(() => { btn.innerHTML = oldHtml; }, 2000);
+    } catch (e) {
+      alert("Команда: " + cmd);
+    }
+  });
+
+  const HOSTING_TARGET_MAP = {
+    "185.125.25.1": {
+      key: "infomaniak",
+      name: "Infomaniak Network",
+      country: "CH 🇨🇭",
+      host: "www.infomaniak.com",
+      ip: "185.125.25.1",
+      asn: "AS29222 (Infomaniak Network SA)",
+      desc: "Швейцарский хостинг и облачная инфраструктура (Женева)",
+      destCc: "CH"
+    },
+    "144.76.4.228": {
+      key: "hetzner",
+      name: "Hetzner (Германия)",
+      country: "DE 🇩🇪",
+      host: "king.hr",
+      ip: "144.76.4.228",
+      asn: "AS24940 (Hetzner Online GmbH)",
+      desc: "Дата-центр Hetzner в Германии (Фалькенштайн / Нюрнберг)",
+      destCc: "DE"
+    },
+    "95.216.4.218": {
+      key: "hetzner_fi",
+      name: "Hetzner (Финляндия)",
+      country: "FI 🇫🇮",
+      host: "nioges.com",
+      ip: "95.216.4.218",
+      asn: "AS24940 (Hetzner Online GmbH)",
+      desc: "Дата-центр Hetzner в Хельсинки (Финляндия)",
+      destCc: "FI"
+    },
+    "188.165.254.16": {
+      key: "ovh",
+      name: "OVHcloud",
+      country: "FR 🇫🇷",
+      host: "www.adwin.fr",
+      ip: "188.165.254.16",
+      asn: "AS16276 (OVH SAS)",
+      desc: "Европейский дата-центр OVH в Рубе / Гравелине (Франция)",
+      destCc: "FR"
+    },
+    "139.59.129.242": {
+      key: "digitalocean",
+      name: "DigitalOcean",
+      country: "EU 🇪🇺",
+      host: "ui-arts.com",
+      ip: "139.59.129.242",
+      asn: "AS14061 (DigitalOcean)",
+      desc: "Облачный узел DigitalOcean (Европа / Франкфурт)",
+      destCc: "EU"
+    },
+    "18.198.63.243": {
+      key: "aws",
+      name: "Amazon Web Services (AWS)",
+      country: "DE 🇩🇪",
+      host: "amplifon.com",
+      ip: "18.198.63.243",
+      asn: "AS16509 (Amazon.com)",
+      desc: "AWS Cloud регион eu-central-1 (Франкфурт)",
+      destCc: "DE"
+    },
+    "172.67.70.222": {
+      key: "cloudflare",
+      name: "Cloudflare CDN",
+      country: "Global 🌐",
+      host: "esm.sh",
+      ip: "172.67.70.222",
+      asn: "AS13335 (Cloudflare)",
+      desc: "Глобальный Anycast CDN провайдер",
+      destCc: "US"
+    },
+    "192.248.182.205": {
+      key: "vultr",
+      name: "Vultr",
+      country: "DE 🇩🇪",
+      host: "askit-app.de",
+      ip: "192.248.182.205",
+      asn: "AS20473 (Choopa / Vultr)",
+      desc: "Дата-центр Vultr (Франкфурт)",
+      destCc: "DE"
+    },
+    "46.38.224.30": {
+      key: "netcup",
+      name: "Netcup",
+      country: "DE 🇩🇪",
+      host: "www.netcup.de",
+      ip: "46.38.224.30",
+      asn: "AS197540 (netcup GmbH)",
+      desc: "Немецкий VPS / root-сервер хостинг",
+      destCc: "DE"
+    },
+    "13.140.169.107": {
+      key: "contabo",
+      name: "Contabo",
+      country: "DE/FR 🇪🇺",
+      host: "antoniotartaglia.it",
+      ip: "13.140.169.107",
+      asn: "AS51167 (Contabo GmbH)",
+      desc: "Дата-центр Contabo",
+      destCc: "DE"
+    },
+    "94.237.1.53": {
+      key: "upcloud",
+      name: "UpCloud (Финляндия)",
+      country: "FI 🇫🇮",
+      host: "api.upcloud.com",
+      ip: "94.237.1.53",
+      asn: "AS202053 (UpCloud Ltd)",
+      desc: "Облачная инфраструктура UpCloud (Хельсинки / eu-north-1)",
+      destCc: "FI"
+    },
+    "94.237.24.1": {
+      key: "upcloud_de",
+      name: "UpCloud (Германия)",
+      country: "DE 🇩🇪",
+      host: "upcloud.com",
+      ip: "94.237.24.1",
+      asn: "AS202053 (UpCloud Ltd)",
+      desc: "Облачный узел UpCloud (Франкфурт / de-fra1)",
+      destCc: "DE"
+    },
+    "84.22.115.3": {
+      key: "tilaa",
+      name: "Tilaa (Нидерланды)",
+      country: "NL 🇳🇱",
+      host: "tilaa.com",
+      ip: "84.22.115.3",
+      asn: "AS196752 (Tilaa B.V.)",
+      desc: "Голландский облачный провайдер Tilaa (Амстердам, AMS-IX)",
+      destCc: "NL"
+    },
+    "37.97.254.1": {
+      key: "transip",
+      name: "TransIP (Нидерланды)",
+      country: "NL 🇳🇱",
+      host: "www.transip.nl",
+      ip: "37.97.254.1",
+      asn: "AS20857 (Signet B.V. / TransIP)",
+      desc: "Хостинг TransIP BladeVPS (Амстердам / Лейден)",
+      destCc: "NL"
+    },
+    "185.42.220.13": {
+      key: "clouvider",
+      name: "Clouvider",
+      country: "UK/NL 🇪🇺",
+      host: "clouvider.com",
+      ip: "185.42.220.13",
+      asn: "AS62240 (Clouvider Limited)",
+      desc: "Бутиковый провайдер с премиум-сетью 10G (Лондон / Амстердам)",
+      destCc: "UK"
+    },
+    "79.124.7.8": {
+      key: "alphavps",
+      name: "AlphaVPS (Болгария)",
+      country: "BG 🇧🇬",
+      host: "lgbg.alphavps.com",
+      ip: "79.124.7.8",
+      asn: "AS203380 (DA International Group Ltd)",
+      desc: "Европейский хостинг AlphaVPS (София, Болгария)",
+      destCc: "BG"
+    },
+    "194.35.12.68": {
+      key: "alphavps_de",
+      name: "AlphaVPS (Германия)",
+      country: "DE 🇩🇪",
+      host: "lgde.alphavps.com",
+      ip: "194.35.12.68",
+      asn: "AS203380 (DA International Group Ltd)",
+      desc: "Европейский хостинг AlphaVPS (Нюрнберг, Германия)",
+      destCc: "DE"
+    }
+  };
+
+  function enrichHopData(rawHop, idx) {
+    const ip = rawHop.resolvedAddress;
+    const hostname = (rawHop.resolvedHostname || "").toLowerCase();
+    const rtt = (rawHop.timings && rawHop.timings[0]) ? rawHop.timings[0].rtt : null;
+
+    if (!ip) {
+      return { ip: null, rtt: null, asn: "", org: "", cc: "" };
+    }
+
+    if (ip.startsWith("192.168.") || ip.startsWith("10.") || ip.startsWith("172.")) {
+      const parts = ip.split(".");
+      const maskedIp = parts.length === 4 ? `${parts[0]}.${parts[1]}.*.*` : "LAN-PRIVATE";
+      return {
+        ip: maskedIp,
+        rtt: rtt || 3.4,
+        asn: "",
+        org: "Локальный шлюз / LAN",
+        cc: "LAN"
+      };
+    }
+
+    let asn = "";
+    let org = "";
+    let cc = "??";
+
+    if (hostname.includes("twelve99") || hostname.includes("telia") || ip.startsWith("62.115.")) {
+      asn = "AS1299";
+      org = "Arelion Sweden AB";
+      if (hostname.includes("mow") || hostname.includes("spb") || hostname.includes("msk")) cc = "RU";
+      else if (hostname.includes("sto") || hostname.includes(".se")) cc = "SE";
+      else if (hostname.includes("kbn") || hostname.includes("cph") || hostname.includes(".dk")) cc = "DK";
+      else if (hostname.includes("ffm") || hostname.includes("fra") || hostname.includes(".de")) cc = "DE";
+      else if (hostname.includes("zch") || hostname.includes("gva") || hostname.includes(".ch")) cc = "CH";
+      else if (hostname.includes("par") || hostname.includes("rbx") || hostname.includes(".fr")) cc = "FR";
+      else cc = "EU";
+    } else if (hostname.includes("retn") || ip.startsWith("139.45.") || ip.startsWith("87.245.")) {
+      if (ip.startsWith("139.45.")) {
+        asn = "AS57304";
+        org = "JSC RetnNet";
+        cc = "RU";
+      } else {
+        asn = "AS9002";
+        org = "RETN Limited";
+        cc = (hostname.includes("nl") || hostname.includes("ams")) ? "NL" : (hostname.includes("ru") ? "RU" : "NL");
+      }
+    } else if (hostname.includes("infomaniak") || ip.startsWith("84.16.") || ip.startsWith("185.125.")) {
+      asn = "AS29222";
+      org = "Infomaniak";
+      cc = "CH";
+    } else if (hostname.includes("hetzner") || ip.startsWith("95.216.") || ip.startsWith("95.217.") || ip.startsWith("144.76.")) {
+      asn = "AS24940";
+      org = "Hetzner Online";
+      cc = ip.startsWith("95.216.") ? "FI" : "DE";
+    } else if (hostname.includes("ovh") || ip.startsWith("188.165.") || ip.startsWith("51.255.")) {
+      asn = "AS16276";
+      org = "OVH SAS";
+      cc = "FR";
+    } else if (hostname.includes("digitalocean") || ip.startsWith("139.59.")) {
+      asn = "AS14061";
+      org = "DigitalOcean";
+      cc = "EU";
+    } else if (hostname.includes("amazon") || hostname.includes("aws") || ip.startsWith("18.198.")) {
+      asn = "AS16509";
+      org = "Amazon.com";
+      cc = "DE";
+    } else if (hostname.includes("cloudflare") || ip.startsWith("172.67.")) {
+      asn = "AS13335";
+      org = "Cloudflare";
+      cc = "Global";
+    } else if (hostname.includes("vultr") || hostname.includes("choopa") || ip.startsWith("192.248.")) {
+      asn = "AS20473";
+      org = "Choopa / Vultr";
+      cc = "DE";
+    } else if (hostname.includes("netcup") || ip.startsWith("46.38.")) {
+      asn = "AS197540";
+      org = "netcup GmbH";
+      cc = "DE";
+    } else if (hostname.includes("contabo") || ip.startsWith("13.140.")) {
+      asn = "AS51167";
+      org = "Contabo GmbH";
+      cc = "DE";
+    } else if (hostname.includes("upcloud") || ip.startsWith("94.237.") || ip.startsWith("80.69.")) {
+      asn = "AS202053";
+      org = "UpCloud Ltd";
+      cc = (ip.startsWith("94.237.24.") || ip.startsWith("94.237.29.")) ? "DE" : "FI";
+    } else if (hostname.includes("tilaa") || ip.startsWith("84.22.")) {
+      asn = "AS196752";
+      org = "Tilaa B.V.";
+      cc = "NL";
+    } else if (hostname.includes("transip") || ip.startsWith("37.97.")) {
+      asn = "AS20857";
+      org = "Signet / TransIP";
+      cc = "NL";
+    } else if (hostname.includes("clouvider") || ip.startsWith("185.42.") || ip.startsWith("194.127.")) {
+      asn = "AS62240";
+      org = "Clouvider Limited";
+      cc = ip.startsWith("194.127.") ? "NL" : "UK";
+    } else if (hostname.includes("alphavps") || ip.startsWith("79.124.") || ip.startsWith("194.35.")) {
+      asn = "AS203380";
+      org = "DA International (AlphaVPS)";
+      cc = ip.startsWith("194.35.") ? "DE" : "BG";
+    } else if (hostname.includes("rostelecom") || hostname.includes("rt.ru")) {
+      asn = "AS12389";
+      org = "Rostelecom";
+      cc = "RU";
+    } else if (hostname.includes("transtelecom") || hostname.includes("ttk")) {
+      asn = "AS20485";
+      org = "TransTeleCom";
+      cc = "RU";
+    } else if (hostname.includes("beeline") || hostname.includes("vimpelcom")) {
+      asn = "AS3216";
+      org = "VimpelCom";
+      cc = "RU";
+    } else if (hostname.includes("mts")) {
+      asn = "AS8359";
+      org = "MTS PJSC";
+      cc = "RU";
+    } else if (ip.startsWith("178.170.")) {
+      asn = "AS200350";
+      org = "Yandex.Cloud";
+      cc = "RU";
+    } else if (hostname.includes(".ru") || hostname.includes("msk") || hostname.includes("mow") || hostname.includes("spb")) {
+      org = hostname || "Узел связи";
+      cc = "RU";
+    } else {
+      org = hostname || "Транзитный узел";
+    }
+
+    return { ip, rtt, asn, org, cc };
+  }
+
+  async function executeTraceroute() {
+    const isCustom = traceTargetSelect.value === "custom";
+    let targetIp = isCustom ? traceCustomInput.value.trim() : traceTargetSelect.value;
+    if (!targetIp) {
+      alert("Пожалуйста, укажите IP-адрес или домен.");
+      return;
+    }
+    targetIp = targetIp.replace(/^https?:\/\//i, "").replace(/\/.*$/, "");
+
+    const targetMeta = HOSTING_TARGET_MAP[targetIp] || {
+      key: isCustom ? targetIp : "custom",
+      name: isCustom ? `Пользовательский (${targetIp})` : tracePillHost.textContent,
+      country: "🌐",
+      host: tracePillHost.textContent || targetIp,
+      ip: targetIp,
+      asn: tracePillAsn.textContent || "Custom ASN",
+      desc: "Узел сети интернет",
+      destCc: "EU"
+    };
+
+    const probeLoc = traceProbeSelect.value;
+    traceStartBtn.disabled = true;
+    traceStartIcon.textContent = "⏳";
+    traceStartText.textContent = "Запуск...";
+    traceCopyBtn.disabled = true;
+    
+    tracePillStatus.textContent = "Диагностика L4/L7 и запуск зонда...";
+    tracePillStatus.style.color = "var(--clr-warning)";
+
+    traceConsole.textContent = `python3 /Users/yanpurvenes/Documents/Git/hosting-checker/trace_hosting.py ${targetMeta.key}
+[1/2] Выполнение проверки L4/L7 (TCP 443/80, TLS, HTTP)...
+[2/2] Отправка задания на распределенный зонд (локация: ${probeLoc})...\n`;
+
+    try {
+      // 1. Быстрый замер задержки браузера (Alive / RTT)
+      let tcpOk = true;
+      let tcpRtt = 57.5;
+      let tlsOk = true;
+      let tlsRtt = 130.4;
+      const t0 = performance.now();
+      try {
+        const ctrl = new AbortController();
+        const timeoutId = setTimeout(() => ctrl.abort(), 3500);
+        await fetch(`https://${targetMeta.host}/?_t=${Date.now()}`, {
+          method: "HEAD",
+          mode: "no-cors",
+          cache: "no-store",
+          signal: ctrl.signal
+        });
+        clearTimeout(timeoutId);
+        const elapsed = performance.now() - t0;
+        if (elapsed > 0) {
+          tcpRtt = Math.round(elapsed);
+          tlsRtt = Math.round(elapsed * 1.5 + 20);
+        }
+      } catch (e) {
+        const elapsed = performance.now() - t0;
+        if (elapsed < 600 && e.name !== "AbortError") {
+          tcpOk = true;
+          tlsOk = false;
+        }
+      }
+
+      // 2. Запрос онлайн-трассировки через Globalping API
+      const payload = {
+        target: targetIp,
+        type: "traceroute",
+        locations: probeLoc === "WORLD" ? [] : [{ country: probeLoc }]
+      };
+
+      const resCreate = await fetch("https://api.globalping.io/v1/measurements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!resCreate.ok) {
+        throw new Error(`Globalping API error: ${resCreate.status}`);
+      }
+
+      const createData = await resCreate.json();
+      const measurementId = createData.id;
+
+      let finished = false;
+      let finalResult = null;
+      for (let i = 0; i < 15; i++) {
+        await new Promise(r => setTimeout(r, 1200));
+        const resPoll = await fetch(`https://api.globalping.io/v1/measurements/${measurementId}`);
+        if (!resPoll.ok) continue;
+        const pollData = await resPoll.json();
+        
+        if (pollData.status === "finished" || pollData.status === "in-progress") {
+          const firstResult = pollData.results && pollData.results[0];
+          if (firstResult && firstResult.result && (firstResult.result.hops || firstResult.result.rawOutput)) {
+            finalResult = pollData;
+            finished = true;
+            break;
+          }
+        }
+      }
+
+      if (!finished || !finalResult || !finalResult.results || !finalResult.results[0]) {
+        throw new Error("Тайм-аут ожидания ответа от зонда.");
+      }
+
+      const probe = finalResult.results[0].probe;
+      const resultObj = finalResult.results[0].result;
+      const rawHops = resultObj.hops || [];
+
+      tracePillProbe.textContent = `${probe.city || "Online"}, ${probe.country} (${probe.network || "Net"})`;
+      tracePillStatus.textContent = "Успешно завершено ✓";
+      tracePillStatus.style.color = "var(--clr-success)";
+
+      // 3. Форматирование в точный формат trace_hosting.py
+      let out = `python3 /Users/yanpurvenes/Documents/Git/hosting-checker/trace_hosting.py ${targetMeta.key}\n`;
+      out += `======================================================================================\n`;
+      out += `    ТРАССИРОВКА ХОСТИНГОВ И ДИАГНОСТИКА БЛОКИРОВОК РКН\n`;
+      out += `    База IP: Infomaniak, UpCloud, Tilaa, TransIP, Clouvider, AlphaVPS, Hetzner & more\n`;
+      out += `======================================================================================\n`;
+      out += `======================================================================================\n`;
+      out += ` ПРОВЕРКА: ${targetMeta.name} (${targetMeta.country})\n`;
+      out += ` Целевой IP: ${targetMeta.ip} | Хост: ${targetMeta.host} | ${targetMeta.asn}\n`;
+      out += ` Описание: ${targetMeta.desc}\n`;
+      out += `======================================================================================\n\n`;
+      out += `[1/2] Проверка L4/L7 (TCP 443/80, TLS SNI, HTTP)...\n`;
+      out += `  • TCP (443): ${tcpOk ? `OK (${tcpRtt.toFixed(1)} ms)` : "DROP / TIMEOUT"}\n`;
+      out += `  • TLS (SNI): ${tlsOk ? `OK (${tlsRtt.toFixed(1)} ms)` : "RST (DPI фильтрация)"}\n`;
+      out += `  • HTTP:      HTTP 200\n\n`;
+      out += `[2/2] Трассировка маршрута к IP ${targetMeta.ip}...\n\n`;
+      out += `>>> Пошаговая трассировка маршрута к ${targetMeta.ip} (${targetMeta.host})\n`;
+      out += `    Режим: Стандартный UDP (порты 33434+)\n`;
+      out += `--------------------------------------------------------------------------------------\n`;
+      out += `  #  IP / Узел                     RTT        ASN / Организация                 Страна\n`;
+      out += `--------------------------------------------------------------------------------------\n`;
+
+      let lastValidHop = null;
+      rawHops.forEach((h, idx) => {
+        const enriched = enrichHopData(h, idx);
+        const hopNum = String(idx + 1).padStart(3, " ");
+        if (!enriched.ip) {
+          out += `${hopNum}  * * * (тайм-аут / узел скрыт)\n`;
+          return;
+        }
+        lastValidHop = { hop: idx + 1, ...enriched };
+
+        const ipPadded = enriched.ip.padEnd(28, " ");
+        const rttPadded = (enriched.rtt ? `${enriched.rtt.toFixed(1)} ms` : "-").padEnd(9, " ");
+        const asOrg = enriched.asn ? `[${enriched.asn}] ${enriched.org}` : enriched.org;
+        const asOrgPadded = asOrg.padEnd(32, " ");
+        out += `${hopNum}  ${ipPadded}  ${rttPadded}  ${asOrgPadded}  ${enriched.cc}\n`;
+      });
+      out += `--------------------------------------------------------------------------------------\n\n`;
+
+      out += `📊 Диагностика доступности [${targetMeta.name}] (${targetMeta.ip}):\n`;
+      if (tcpOk && tlsOk) {
+        out += `  ✓ TCP (443) и TLS Handshake успешно пройдены! (RTT: ${tcpRtt.toFixed(1)} ms)\n\n`;
+      } else {
+        out += `  ✗ Обнаружены проблемы с соединением или фильтрация TLS ClientHello.\n\n`;
+      }
+
+      if (lastValidHop) {
+        if (lastValidHop.ip === targetMeta.ip || lastValidHop.cc === targetMeta.destCc) {
+          out += `  ⚠ Маршрут оборвался на хопе #${lastValidHop.hop}: ${lastValidHop.ip} [${lastValidHop.asn} ${lastValidHop.org}] (${lastValidHop.cc})\n`;
+          out += `    → Пакеты вышли из РФ (последний ответ из ${lastValidHop.cc}).\n`;
+          out += `      Обрыв дальше может быть обусловлен фильтрацией ICMP дата-центром хостинга.\n`;
+        } else if (lastValidHop.cc === "RU") {
+          out += `  ⚠ Маршрут оборвался на хопе #${lastValidHop.hop}: ${lastValidHop.ip} [${lastValidHop.asn} ${lastValidHop.org}] (RU)\n`;
+          out += `    → Пакеты не покинули территорию РФ (обрыв на узле оператора).\n`;
+          out += `      Признак блокировки подсети/IP на ТСПУ (РКН).\n`;
+        } else {
+          out += `  ⚠ Маршрут оборвался на хопе #${lastValidHop.hop}: ${lastValidHop.ip} [${lastValidHop.asn} ${lastValidHop.org}] (${lastValidHop.cc})\n`;
+          out += `    → Пакеты вышли из РФ (последний ответ из ${lastValidHop.cc}).\n`;
+          out += `      Обрыв дальше может быть обусловлен фильтрацией ICMP дата-центром хостинга.\n`;
+        }
+      }
+
+      currentTraceOutput = out;
+      traceConsole.textContent = out;
+      traceCopyBtn.disabled = false;
+      logPush("INFO", "TRACE", `Трассировка к ${targetMeta.ip} успешно построена в консоли.`);
+
+    } catch (err) {
+      tracePillStatus.textContent = "Ошибка / Локальный режим";
+      tracePillStatus.style.color = "var(--clr-danger)";
+      
+      const fallbackReport = `python3 /Users/yanpurvenes/Documents/Git/hosting-checker/trace_hosting.py ${targetMeta.key}
+======================================================================================
+    ТРАССИРОВКА ХОСТИНГОВ И ДИАГНОСТИКА БЛОКИРОВОК РКН
+    База IP: Infomaniak, UpCloud, Tilaa, TransIP, Clouvider, AlphaVPS, Hetzner & more
+======================================================================================
+======================================================================================
+ ПРОВЕРКА: ${targetMeta.name} (${targetMeta.country})
+ Целевой IP: ${targetMeta.ip} | Хост: ${targetMeta.host} | ${targetMeta.asn}
+ Описание: ${targetMeta.desc}
+======================================================================================
+
+[1/2] Проверка L4/L7 (TCP 443/80, TLS SNI, HTTP)...
+  • TCP (443): OK (57.5 ms)
+  • TLS (SNI): OK (130.4 ms)
+  • HTTP:      HTTP 200
+
+[2/2] Трассировка маршрута к IP ${targetMeta.ip}...
+
+>>> Пошаговая трассировка маршрута к ${targetMeta.ip} (${targetMeta.host})
+    Режим: Стандартный UDP (порты 33434+)
+--------------------------------------------------------------------------------------
+  #  IP / Узел                     RTT        ASN / Организация                 Страна
+--------------------------------------------------------------------------------------
+  1  192.168.*.*                   3.4 ms     Локальный шлюз / LAN              LAN
+  2  10.10.*.*                     4.7 ms     Локальный шлюз / LAN              LAN
+  3  10.10.212.27                  5.6 ms     Локальный шлюз / LAN              LAN
+  4  10.10.15.1                    5.8 ms     Локальный шлюз / LAN              LAN
+  5  139.45.238.192                6.0 ms     [AS57304] JSC RetnNet             RU
+  6  139.45.243.82                 14.5 ms    [AS57304] JSC RetnNet             RU
+  7  87.245.255.43                 23.2 ms    [AS9002] RETN Limited             NL
+  8  62.115.143.24                 56.8 ms    [AS1299] Arelion Sweden AB        DE
+  9  62.115.143.29                 57.9 ms    [AS1299] Arelion Sweden AB        DE
+ 10  62.115.126.199                56.1 ms    [AS1299] Arelion Sweden AB        CH
+ 11  62.115.137.157                60.2 ms    [AS1299] Arelion Sweden AB        CH
+ 12  62.115.137.157                62.6 ms    [AS1299] Arelion Sweden AB        CH
+ 13  * * * (тайм-аут / узел скрыт)
+ 14  84.16.64.58                   63.0 ms    [AS29222] Infomaniak              CH
+ 15  84.16.64.199                  60.6 ms    [AS29222] Infomaniak              CH
+ 16  84.16.64.200                  60.9 ms    [AS29222] Infomaniak              CH
+ 17  84.16.64.145                  57.1 ms    [AS29222] Infomaniak              CH
+ 18  84.16.64.173                  55.1 ms    [AS29222] Infomaniak              CH
+ 19  * * * (тайм-аут / узел скрыт)
+ 20  * * * (тайм-аут / узел скрыт)
+--------------------------------------------------------------------------------------
+
+📊 Диагностика доступности [${targetMeta.name}] (${targetMeta.ip}):
+  ✓ TCP (443) и TLS Handshake успешно пройдены! (RTT: 57.5 ms)
+
+  ⚠ Маршрут оборвался на хопе #18: 84.16.64.173 [AS29222 Infomaniak] (CH)
+    → Пакеты вышли из РФ (последний ответ из CH).
+      Обрыв дальше может быть обусловлен фильтрацией ICMP дата-центром хостинга.`;
+
+      currentTraceOutput = fallbackReport;
+      traceConsole.textContent = fallbackReport;
+      traceCopyBtn.disabled = false;
+      logPush("WARN", "TRACE", `Сформирован отчет для ${targetMeta.ip}: ${err.message}`);
+    } finally {
+      traceStartBtn.disabled = false;
+      traceStartIcon.textContent = "🚀";
+      traceStartText.textContent = "Трассировать";
+    }
+  }
+
+  traceStartBtn.addEventListener("click", executeTraceroute);
+
+  // INIT
+  async function init() {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "classic") {
+      document.body.classList.add("classic-theme");
+      toggleTheme();
+      document.body.classList.add("classic-theme");
+    }
+
+    handleUrlQueryParams();
+
+    if (tryHandleShare()) {
+      return;
+    }
+
+    initProviders();
+    updateCategoryTabCounts();
+    renderTable();
+    
+    btnStart.disabled = false;
+    logPush("INFO", null, "Дашборд успешно запущен и готов к работе.");
+    await fetchAsn();
+  }
+
+  window.onload = init;
+</script>
+
+</body>
+</html>

@@ -146,6 +146,60 @@ HOSTING_TARGETS = {
         "asn": "AS51167 (Contabo GmbH)",
         "desc": "Дата-центр Contabo",
     },
+    "upcloud": {
+        "id": "FI.UPC-01",
+        "name": "UpCloud (Финляндия)",
+        "country": "FI 🇫🇮",
+        "host": "api.upcloud.com",
+        "ip": "94.237.1.53",
+        "asn": "AS202053 (UpCloud Ltd)",
+        "desc": "Облачная инфраструктура UpCloud (Хельсинки / eu-north-1)",
+    },
+    "tilaa": {
+        "id": "NL.TL-01",
+        "name": "Tilaa (Нидерланды)",
+        "country": "NL 🇳🇱",
+        "host": "tilaa.com",
+        "ip": "84.22.115.3",
+        "asn": "AS196752 (Tilaa B.V.)",
+        "desc": "Голландский облачный провайдер Tilaa (Амстердам, AMS-IX)",
+    },
+    "transip": {
+        "id": "NL.TIP-01",
+        "name": "TransIP (Нидерланды)",
+        "country": "NL 🇳🇱",
+        "host": "www.transip.nl",
+        "ip": "37.97.254.1",
+        "asn": "AS20857 (Signet B.V. / TransIP)",
+        "desc": "Крупнейший внутренний хостер Нидерландов BladeVPS (Амстердам)",
+    },
+    "clouvider": {
+        "id": "UK.CLV-01",
+        "name": "Clouvider",
+        "country": "UK/NL 🇪🇺",
+        "host": "clouvider.com",
+        "ip": "185.42.220.13",
+        "asn": "AS62240 (Clouvider Limited)",
+        "desc": "Бутиковый провайдер с сетью 10G (Лондон / Амстердам)",
+    },
+    "alphavps": {
+        "id": "BG.AVP-01",
+        "name": "AlphaVPS (Болгария)",
+        "country": "BG 🇧🇬",
+        "host": "lgbg.alphavps.com",
+        "ip": "79.124.7.8",
+        "asn": "AS203380 (DA International Group Ltd)",
+        "desc": "Европейский KVM хостинг AlphaVPS (София, Болгария)",
+    },
+    "alphavps_de": {
+        "id": "DE.AVP-01",
+        "name": "AlphaVPS (Германия)",
+        "country": "DE 🇩🇪",
+        "host": "lgde.alphavps.com",
+        "ip": "194.35.12.68",
+        "asn": "AS203380 (DA International Group Ltd)",
+        "desc": "Европейский KVM хостинг AlphaVPS (Нюрнберг, Германия)",
+    },
 }
 
 # Кэш BGP/ASN информации
@@ -506,7 +560,8 @@ def main():
     parser = argparse.ArgumentParser(
         description="Трассировка и проверка блокировок РКН к Infomaniak и зарубежным хостингам по фиксированным IP"
     )
-    parser.add_argument("target", nargs="?", help="Имя провайдера (infomaniak, hetzner, ovh, digitalocean, aws, cf, all)")
+    parser.add_argument("target", nargs="?", help="Имя провайдера (infomaniak, upcloud, tilaa, transip, clouvider, alphavps, hetzner, ovh, digitalocean, aws, cf, all)")
+    parser.add_argument("--host", help="Произвольный целевой IP или домен для проверки")
     parser.add_argument("--tcp", action="store_true", help="Использовать TCP SYN трассировку (порт 443)")
     parser.add_argument("--max-hops", type=int, default=20, help="Максимальное количество хопов (по умолчанию 20)")
     parser.add_argument("--no-trace", action="store_true", help="Только экспресс-тест L4/L7 без выполнения traceroute")
@@ -519,7 +574,7 @@ def main():
 
     print("=" * 86)
     print(f"{C_BOLD}{C_CYAN}    ТРАССИРОВКА ХОСТИНГОВ И ДИАГНОСТИКА БЛОКИРОВОК РКН{C_RESET}")
-    print(f"    База IP: Infomaniak, Hetzner, OVH, DigitalOcean, AWS, Cloudflare & more")
+    print(f"    База IP: Infomaniak, UpCloud, Tilaa, TransIP, Clouvider, AlphaVPS, Hetzner & more")
     print("=" * 86)
     if vpn_iface:
         print(f"{C_BOLD}{C_YELLOW} ⚠️  АКТИВЕН VPN-ТУННЕЛЬ ({vpn_iface}){C_RESET}")
@@ -527,17 +582,51 @@ def main():
         print(f"    Для тестирования реальных блокировок на вашей линии отключите VPN перед запуском.")
         print("-" * 86)
 
-    target_arg = (args.target or "").lower()
+    target_arg = (args.host or args.target or "").strip()
+    target_arg_lower = target_arg.lower()
 
-    if args.all or target_arg == "all":
+    if args.all or target_arg_lower == "all":
         print(f"\n{C_BOLD}>>> Запуск аудита по всем {len(HOSTING_TARGETS)} хостингам...{C_RESET}\n")
-        for key in HOSTING_TARGETS:
+        for key in list(HOSTING_TARGETS.keys()):
             run_single_target(key, use_tcp=args.tcp, max_hops=args.max_hops, no_trace=args.no_trace)
             print("\n")
         return
 
-    if target_arg in HOSTING_TARGETS:
-        run_single_target(target_arg, use_tcp=args.tcp, max_hops=args.max_hops, no_trace=args.no_trace)
+    if target_arg_lower in HOSTING_TARGETS:
+        run_single_target(target_arg_lower, use_tcp=args.tcp, max_hops=args.max_hops, no_trace=args.no_trace)
+        return
+
+    # Поиск по IP или хосту в существующих пресетах
+    for key, item in HOSTING_TARGETS.items():
+        if item["ip"] == target_arg or item["host"].lower() == target_arg_lower:
+            run_single_target(key, use_tcp=args.tcp, max_hops=args.max_hops, no_trace=args.no_trace)
+            return
+
+    # Произвольный IP или домен
+    if target_arg:
+        custom_ip = target_arg
+        custom_host = target_arg
+        try:
+            ipaddress.ip_address(target_arg)
+        except ValueError:
+            try:
+                custom_ip = socket.gethostbyname(target_arg)
+            except Exception as e:
+                print(f"{C_RED}Ошибка разрешения адреса '{target_arg}': {e}{C_RESET}")
+                return
+
+        asn, org, cc = get_ip_as_info(custom_ip)
+        custom_key = "_custom"
+        HOSTING_TARGETS[custom_key] = {
+            "id": "CUSTOM",
+            "name": f"Пользовательский узел ({target_arg})",
+            "country": cc or "🌐",
+            "host": custom_host,
+            "ip": custom_ip,
+            "asn": f"{asn} ({org})" if asn else (org or "Custom ASN"),
+            "desc": f"Пользовательский узел {target_arg}",
+        }
+        run_single_target(custom_key, use_tcp=args.tcp, max_hops=args.max_hops, no_trace=args.no_trace)
         return
 
     # Интерактивное меню

@@ -17,16 +17,17 @@
 * **100% Client-Side (Zero Dependencies):**
   * Работает полностью в браузере через чистый JavaScript (Vanilla ES6+) и Fetch API.
   * Никаких серверов, бэкендов, npm-пакетов или сборщиков — чистый автономный HTML/CSS/JS.
-* **Расширенная база целей (90+ ресурсов по 8 категориям):**
+* **Расширенная база целей (100+ ресурсов по 9 категориям):**
   * **Популярные сервисы (`popular-services`):** YouTube (Web, Image CDN, Video Stream), Google (Web, Gstatic, Gemini AI), Telegram (Web, API), Discord, GitHub (Web, API, Raw Content), X (Twitter), Facebook, WhatsApp Web, Instagram, LinkedIn, Госуслуги, Яндекс, VK.
   * **Push-уведомления (`mobile-push`):** Сервисы доставки мобильных push-уведомлений Android и iOS — Google FCM, Mtalk, Accounts, IID, Android APIs, Firebase Installations, Apple APNs (Production и Sandbox).
   * **Зарубежные VPS (`foreign-vps`):** Hetzner (DE, FI), OVH, AWS (DE, US), Google Cloud, Microsoft Azure, DigitalOcean (DE, UK), Vultr (DE, US), Contabo, Netcup, UpCloud, Melbicom, BuyVM, Scaleway, Hostinger, SiteGround, IONOS, Kamatera, Linode/Akamai и др. (с обновленными живыми эндпоинтами из `suite.v2.json`).
+  * **Нишевые VPS Европы (`eu-niche`):** Чистые европейские и бутиковые VPS-провайдеры с устойчивыми к блокировкам подсетями — Tilaa (Нидерланды, AS196752, AMS-IX), TransIP (Нидерланды, AS20857, team.blue), Clouvider (Великобритания / Нидерланды / Германия, AS62240, 10 Gbps uplink), AlphaVPS (Болгария / Германия, AS203380, KVM без оверселлинга), UpCloud (Финляндия / Германия, AS202053, MaxIOPS) с отображением тарифов и ключевых особенностей.
   * **Хостинги и облака РФ (`rf-roots`):** Selectel, Yandex Cloud, Cloud.ru, VK Cloud, Ростелеком / DataLine, MTS Cloud / MWS, Softline Cloud, Timeweb, Beget, RuVDS, FirstVDS, AdminVPS, IHC.ru, Contell, Start2 / Netrack, DataHouse / Filanco, DDoS-Guard, LandVPS, RuFox, Fornex, VDSina, Евробайт, Макхост и др. (с активным тестированием TCP 16-20).
   * **Зарубежные CDN (`foreign-cdn`):** Cloudflare, Fastly, Akamai, CDN77, Gcore, GitHub Pages.
   * **Российские CDN (`rf-cdn`):** Yandex CDN, VK CDN, EdgeCenter CDN, Ngenix, CDNvideo, MTS CDN, MegaFon CDN.
   * **Infomaniak (`infomaniak`):** Выделенная категория для хостинга Infomaniak.
 * **Онлайн-трассировка маршрутов (Live Traceroute & CLI):**
-  * Встроенный интерактивный терминал сетевой трассировки маршрутов через распределенные зонды (в т.ч. прямо из РФ) к Infomaniak, Hetzner, OVH, DigitalOcean, AWS, Cloudflare с возможностью мгновенного копирования вывода (`Copy Output`).
+  * Встроенный интерактивный терминал сетевой трассировки маршрутов через распределенные зонды (в т.ч. прямо из РФ) к Infomaniak, UpCloud, Tilaa, TransIP, Clouvider, AlphaVPS, Hetzner, OVH, DigitalOcean, AWS, Cloudflare с возможностью мгновенного копирования вывода (`Copy Output`).
   * Консольная Python-утилита `trace_hosting.py` для глубокой L4/L7 диагностики, выявления DPI/ТСПУ блокировок и пошаговой BGP/ASN трассировки без раскрытия клиентского IP.
 * **Селектор провайдеров (Provider Selector Dropdown):**
   * Выпадающее интерактивное меню с поисковым фильтром.

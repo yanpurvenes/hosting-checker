@@ -1281,9 +1281,11 @@
               <option value="94.237.1.53" data-host="api.upcloud.com" data-asn="AS202053 UpCloud Ltd (FI)">UpCloud Helsinki (94.237.1.53 | api.upcloud.com)</option>
               <option value="94.237.24.1" data-host="upcloud.com" data-asn="AS202053 UpCloud Ltd (DE)">UpCloud Frankfurt (94.237.24.1)</option>
             </optgroup>
-            <optgroup label="🇳🇱 Нидерланды (Tilaa & TransIP)">
+            <optgroup label="🇳🇱 Нидерланды (Tilaa, TransIP, Leaseweb)">
               <option value="84.22.115.3" data-host="tilaa.com" data-asn="AS196752 Tilaa B.V. (NL)">Tilaa Amsterdam (84.22.115.3 | tilaa.com)</option>
               <option value="37.97.254.1" data-host="www.transip.nl" data-asn="AS20857 Signet / TransIP (NL)">TransIP BladeVPS (37.97.254.1 | www.transip.nl)</option>
+              <option value="5.79.108.33" data-host="mirror.nl.leaseweb.net" data-asn="AS16265 Leaseweb Netherlands (NL)">Leaseweb Amsterdam (5.79.108.33 | mirror.nl.leaseweb.net)</option>
+              <option value="136.144.200.162" data-host="lg.leasewebstatus.com" data-asn="AS16265 Leaseweb Global (NL)">Leaseweb LG (136.144.200.162 | lg.leasewebstatus.com)</option>
             </optgroup>
             <optgroup label="🇬🇧/🇧🇬 Clouvider & AlphaVPS">
               <option value="185.42.220.13" data-host="clouvider.com" data-asn="AS62240 Clouvider Limited (UK/NL)">Clouvider (185.42.220.13 | clouvider.com)</option>
@@ -1492,6 +1494,9 @@
     { id: "BG.AVP-03", provider: "AlphaVPS (Web)", country: "🇧🇬", host: "alphavps.com", category: "eu-niche", desc: "Официальный сайт AlphaVPS", price: "от €3.50/мес", pros: "KVM VPS, DA International" },
     { id: "FI.UPC-01", provider: "UpCloud", country: "🇫🇮", host: "api.upcloud.com", category: "eu-niche", desc: "Европейский производительный облачный провайдер (Хельсинки, Финляндия, AS202053).", price: "от €5/мес", pros: "NVMe MaxIOPS хранилище, порт 1 Гбит/с, почасовая оплата, SLA 100%" },
     { id: "FI.UPC-02", provider: "UpCloud (Web)", country: "🇫🇮", host: "upcloud.com", category: "eu-niche", desc: "Главный веб-портал облачной платформы UpCloud", price: "от €5/мес", pros: "MaxIOPS, финская юрисдикция" },
+    { id: "NL.LSW-01", provider: "Leaseweb (Mirror AMS)", country: "🇳🇱", host: "mirror.nl.leaseweb.net", category: "eu-niche", desc: "Официальное скоростное зеркало Leaseweb в Амстердаме (AS16265, AMS-01). Прямой пиринг в AMS-IX.", price: "от €4.30–4.50/мес", pros: "Флагманский ЦОД Амстердам, сеть 10+ Tbps, чистый голландский IP" },
+    { id: "NL.LSW-02", provider: "Leaseweb (LG)", country: "🇳🇱", host: "lg.leasewebstatus.com", category: "eu-niche", desc: "Официальный Looking Glass портал Leaseweb (AS16265)", price: "от €4.30/мес", pros: "Диагностический узел Looking Glass, AS16265" },
+    { id: "NL.LSW-03", provider: "Leaseweb (Web)", country: "🇳🇱", host: "www.leaseweb.com", category: "eu-niche", desc: "Главный веб-портал облачной платформы Leaseweb Global B.V.", price: "от €4.30/мес", pros: "Leaseweb Cloud, BGP AS16265" },
 
     // === 5. INFOMANIAK ===
     { id: "CH.INF-01", provider: "Infomaniak", country: "🇨🇭", host: "www.infomaniak.com", category: "infomaniak" },
@@ -2700,6 +2705,26 @@
       desc: "Хостинг TransIP BladeVPS (Амстердам / Лейден)",
       destCc: "NL"
     },
+    "5.79.108.33": {
+      key: "leaseweb",
+      name: "Leaseweb (Амстердам Mirror)",
+      country: "NL 🇳🇱",
+      host: "mirror.nl.leaseweb.net",
+      ip: "5.79.108.33",
+      asn: "AS16265 (Leaseweb Netherlands B.V.)",
+      desc: "Флагманский узел Leaseweb в Амстердаме (AMS-IX, AS16265)",
+      destCc: "NL"
+    },
+    "136.144.200.162": {
+      key: "leaseweb_lg",
+      name: "Leaseweb (Looking Glass)",
+      country: "NL 🇳🇱",
+      host: "lg.leasewebstatus.com",
+      ip: "136.144.200.162",
+      asn: "AS16265 (Leaseweb Global B.V.)",
+      desc: "Официальный узел Looking Glass Leaseweb",
+      destCc: "NL"
+    },
     "185.42.220.13": {
       key: "clouvider",
       name: "Clouvider",
@@ -2824,6 +2849,10 @@
     } else if (hostname.includes("transip") || ip.startsWith("37.97.")) {
       asn = "AS20857";
       org = "Signet / TransIP";
+      cc = "NL";
+    } else if (hostname.includes("leaseweb") || ip.startsWith("5.79.") || ip.startsWith("136.144.") || ip.startsWith("95.211.")) {
+      asn = "AS16265";
+      org = "Leaseweb Netherlands B.V.";
       cc = "NL";
     } else if (hostname.includes("clouvider") || ip.startsWith("185.42.") || ip.startsWith("194.127.")) {
       asn = "AS62240";

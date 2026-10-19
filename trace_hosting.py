@@ -200,6 +200,24 @@ HOSTING_TARGETS = {
         "asn": "AS203380 (DA International Group Ltd)",
         "desc": "Европейский KVM хостинг AlphaVPS (Нюрнберг, Германия)",
     },
+    "leaseweb": {
+        "id": "NL.LSW-01",
+        "name": "Leaseweb (Амстердам Mirror)",
+        "country": "NL 🇳🇱",
+        "host": "mirror.nl.leaseweb.net",
+        "ip": "5.79.108.33",
+        "asn": "AS16265 (Leaseweb Netherlands B.V.)",
+        "desc": "Дата-центр Leaseweb в Амстердаме (AS16265, AMS-IX)",
+    },
+    "leaseweb_lg": {
+        "id": "NL.LSW-02",
+        "name": "Leaseweb (Looking Glass)",
+        "country": "NL 🇳🇱",
+        "host": "lg.leasewebstatus.com",
+        "ip": "136.144.200.162",
+        "asn": "AS16265 (Leaseweb Global B.V.)",
+        "desc": "Официальный Looking Glass Leaseweb (AS16265)",
+    },
 }
 
 # Кэш BGP/ASN информации

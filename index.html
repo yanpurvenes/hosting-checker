@@ -1254,9 +1254,12 @@
             <optgroup label="🇨🇭 Infomaniak (Швейцария)">
               <option value="185.125.25.1" data-host="www.infomaniak.com" data-asn="AS29222 Infomaniak Network SA (CH)" selected>Infomaniak (185.125.25.1 | www.infomaniak.com)</option>
             </optgroup>
-            <optgroup label="🇩🇪/🇫🇮 Hetzner Online">
-              <option value="144.76.4.228" data-host="king.hr" data-asn="AS24940 Hetzner Online GmbH (DE)">Hetzner DE (144.76.4.228 | king.hr)</option>
-              <option value="95.216.4.218" data-host="nioges.com" data-asn="AS24940 Hetzner Online GmbH (FI)">Hetzner FI (95.216.4.218 | nioges.com)</option>
+            <optgroup label="🇩🇪/🇫🇮/🇺🇸 Hetzner Cloud (DE, FI, USA)">
+              <option value="78.46.170.2" data-host="fsn1-speed.hetzner.com" data-asn="AS24940 Hetzner Online GmbH (DE)">Hetzner Falkenstein (78.46.170.2 | fsn1-speed.hetzner.com)</option>
+              <option value="78.47.119.196" data-host="nbg1-speed.hetzner.com" data-asn="AS24940 Hetzner Online GmbH (DE)">Hetzner Nuremberg (78.47.119.196 | nbg1-speed.hetzner.com)</option>
+              <option value="95.217.255.81" data-host="hel1-speed.hetzner.com" data-asn="AS24940 Hetzner Online GmbH (FI)">Hetzner Helsinki (95.217.255.81 | hel1-speed.hetzner.com)</option>
+              <option value="5.161.7.195" data-host="ash-speed.hetzner.com" data-asn="AS213230 Hetzner Online GmbH (US)">Hetzner Ashburn USA (5.161.7.195 | ash-speed.hetzner.com)</option>
+              <option value="5.78.7.195" data-host="hil-speed.hetzner.com" data-asn="AS213230 Hetzner Online GmbH (US)">Hetzner Hillsboro USA (5.78.7.195 | hil-speed.hetzner.com)</option>
             </optgroup>
             <optgroup label="🇫🇷 OVHcloud">
               <option value="188.165.254.16" data-host="www.adwin.fr" data-asn="AS16276 OVH SAS (FR)">OVHcloud (188.165.254.16 | www.adwin.fr)</option>
@@ -1446,11 +1449,11 @@
     { id: "US.FTBVM-02", provider: "FT/BuyVM", country: "🇺🇸", host: "dmvideo.download", category: "foreign-vps" },
     { id: "US.GC-01", provider: "Google Cloud", country: "🇺🇸", host: "api.usercentrics.eu", category: "foreign-vps" },
     { id: "US.GC-02", provider: "Google Cloud", country: "🇺🇸", host: "widgets.reputation.com", category: "foreign-vps" },
-    { id: "DE.HE-01", provider: "Hetzner", country: "🇩🇪", host: "king.hr", category: "foreign-vps" },
-    { id: "DE.HE-02", provider: "Hetzner", country: "🇩🇪", host: "mail.server.apaone.com", category: "foreign-vps" },
-    { id: "FI.HE-01", provider: "Hetzner", country: "🇫🇮", host: "nioges.com", category: "foreign-vps" },
-    { id: "FI.HE-02", provider: "Hetzner", country: "🇫🇮", host: "5fd8bdae.nip.io", category: "foreign-vps" },
-    { id: "FI.HE-03", provider: "Hetzner", country: "🇫🇮", host: "net4u.de", category: "foreign-vps" }, // commit 1eaea5a fix
+    { id: "DE.HE-01", provider: "Hetzner (FSN)", country: "🇩🇪", host: "fsn1-speed.hetzner.com", category: "foreign-vps", desc: "Hetzner Falkenstein (Германия, AS24940). Официальный узел региона FSN1." },
+    { id: "DE.HE-02", provider: "Hetzner (NBG)", country: "🇩🇪", host: "nbg1-speed.hetzner.com", category: "foreign-vps", desc: "Hetzner Nuremberg (Германия, AS24940). Официальный узел региона NBG1." },
+    { id: "FI.HE-01", provider: "Hetzner (HEL)", country: "🇫🇮", host: "hel1-speed.hetzner.com", category: "foreign-vps", desc: "Hetzner Helsinki (Финляндия, AS24940). Официальный узел региона HEL1." },
+    { id: "US.HE-01", provider: "Hetzner (USA-East)", country: "🇺🇸", host: "ash-speed.hetzner.com", category: "foreign-vps", desc: "Hetzner Ashburn (США Восток, Вирджиния, AS213230). Официальный узел региона ASH." },
+    { id: "US.HE-02", provider: "Hetzner (USA-West)", country: "🇺🇸", host: "hil-speed.hetzner.com", category: "foreign-vps", desc: "Hetzner Hillsboro (США Запад, Орегон, AS213230). Официальный узел региона HIL." },
     { id: "US.MBCOM-01", provider: "Melbicom", country: "🇺🇸", host: "elecane.com", category: "foreign-vps" },
     { id: "NL.MS-01", provider: "Microsoft/Azure", country: "🇳🇱", host: "store.takeda.com", category: "foreign-vps" },
     { id: "ES.OR-01", provider: "Oracle", country: "🇪🇸", host: "sh00065.hostgator.com", category: "foreign-vps" },
@@ -2575,25 +2578,55 @@
       desc: "Швейцарский хостинг и облачная инфраструктура (Женева)",
       destCc: "CH"
     },
-    "144.76.4.228": {
-      key: "hetzner",
-      name: "Hetzner (Германия)",
+    "78.46.170.2": {
+      key: "hetzner_fsn",
+      name: "Hetzner Falkenstein (Германия)",
       country: "DE 🇩🇪",
-      host: "king.hr",
-      ip: "144.76.4.228",
+      host: "fsn1-speed.hetzner.com",
+      ip: "78.46.170.2",
       asn: "AS24940 (Hetzner Online GmbH)",
-      desc: "Дата-центр Hetzner в Германии (Фалькенштайн / Нюрнберг)",
+      desc: "Дата-центр Hetzner Фалькенштайн (Германия / FSN1)",
       destCc: "DE"
     },
-    "95.216.4.218": {
-      key: "hetzner_fi",
-      name: "Hetzner (Финляндия)",
-      country: "FI 🇫🇮",
-      host: "nioges.com",
-      ip: "95.216.4.218",
+    "78.47.119.196": {
+      key: "hetzner_nbg",
+      name: "Hetzner Nuremberg (Германия)",
+      country: "DE 🇩🇪",
+      host: "nbg1-speed.hetzner.com",
+      ip: "78.47.119.196",
       asn: "AS24940 (Hetzner Online GmbH)",
-      desc: "Дата-центр Hetzner в Хельсинки (Финляндия)",
+      desc: "Дата-центр Hetzner Нюрнберг (Германия / NBG1)",
+      destCc: "DE"
+    },
+    "95.217.255.81": {
+      key: "hetzner_hel",
+      name: "Hetzner Helsinki (Финляндия)",
+      country: "FI 🇫🇮",
+      host: "hel1-speed.hetzner.com",
+      ip: "95.217.255.81",
+      asn: "AS24940 (Hetzner Online GmbH)",
+      desc: "Дата-центр Hetzner Хельсинки (Финляндия / HEL1)",
       destCc: "FI"
+    },
+    "5.161.7.195": {
+      key: "hetzner_ash",
+      name: "Hetzner Ashburn (США)",
+      country: "US 🇺🇸",
+      host: "ash-speed.hetzner.com",
+      ip: "5.161.7.195",
+      asn: "AS213230 (Hetzner Online GmbH)",
+      desc: "Дата-центр Hetzner в США (Вирджиния / Ашберн / ASH)",
+      destCc: "US"
+    },
+    "5.78.7.195": {
+      key: "hetzner_hil",
+      name: "Hetzner Hillsboro (США)",
+      country: "US 🇺🇸",
+      host: "hil-speed.hetzner.com",
+      ip: "5.78.7.195",
+      asn: "AS213230 (Hetzner Online GmbH)",
+      desc: "Дата-центр Hetzner в США (Орегон / Хиллсборо / HIL)",
+      destCc: "US"
     },
     "188.165.254.16": {
       key: "ovh",
@@ -2806,10 +2839,10 @@
       asn = "AS29222";
       org = "Infomaniak";
       cc = "CH";
-    } else if (hostname.includes("hetzner") || ip.startsWith("95.216.") || ip.startsWith("95.217.") || ip.startsWith("144.76.")) {
-      asn = "AS24940";
+    } else if (hostname.includes("hetzner") || ip.startsWith("95.216.") || ip.startsWith("95.217.") || ip.startsWith("78.46.") || ip.startsWith("78.47.") || ip.startsWith("144.76.") || ip.startsWith("5.161.") || ip.startsWith("5.78.")) {
+      asn = (ip.startsWith("5.161.") || ip.startsWith("5.78.")) ? "AS213230" : "AS24940";
       org = "Hetzner Online";
-      cc = ip.startsWith("95.216.") ? "FI" : "DE";
+      cc = (ip.startsWith("5.161.") || ip.startsWith("5.78.")) ? "US" : (ip.startsWith("95.216.") || ip.startsWith("95.217.")) ? "FI" : "DE";
     } else if (hostname.includes("ovh") || ip.startsWith("188.165.") || ip.startsWith("51.255.")) {
       asn = "AS16276";
       org = "OVH SAS";
